@@ -37,16 +37,21 @@ export function FixedCostsProvider({ children }: PropsWithChildren) {
   }, []);
 
   const addFixedCost = useCallback(async (input: FixedCostInput) => {
-    const next = [FixedCostFactory.create(input), ...fixedCosts];
-    await storageService.save(next);
-    setFixedCosts(next);
-  }, [fixedCosts]);
+    const newCost = FixedCostFactory.create(input);
+    setFixedCosts(prev => {
+      const next = [newCost, ...prev];
+      storageService.save(next);
+      return next;
+    });
+  }, []);
 
   const removeFixedCost = useCallback(async (id: string) => {
-    const next = fixedCosts.filter(cost => cost.id !== id);
-    await storageService.save(next);
-    setFixedCosts(next);
-  }, [fixedCosts]);
+    setFixedCosts(prev => {
+      const next = prev.filter(cost => cost.id !== id);
+      storageService.save(next);
+      return next;
+    });
+  }, []);
 
   const value = useMemo(
     () => ({
