@@ -1,0 +1,25 @@
+# Node modules
+node_modules/
+
+# Expo
+.expo/
+
+# Build outputs
+android/app/build/
+
+# Coverage
+.early.coverage/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Misc
+.env
+
+# Ignore IDE settings
+.vscode/
+.idea/

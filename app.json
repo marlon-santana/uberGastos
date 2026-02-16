@@ -1,0 +1,19 @@
+{
+  "expo": {
+    "name": "DriverCash",
+    "slug": "drivercash",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#0B1110"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "android": {
+      "package": "com.marlonnig.drivercash"
+    }
+  }
+}
