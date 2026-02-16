@@ -2,6 +2,7 @@ import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import DashboardScreen from "@/features/dashboard";
 import TransactionsScreen from "@/features/transactions";
+import FixedCostsScreen from "@/features/fixedCosts";
 import SettingsScreen from "@/screens/SettingsScreen";
 import { colors } from "@/shared/theme";
 import { Feather } from "@expo/vector-icons";
@@ -9,6 +10,7 @@ import { Feather } from "@expo/vector-icons";
 export type RootTabParamList = {
   Dashboard: undefined;
   Historico: undefined;
+  CustoFixo: undefined;
   Configuracoes: undefined;
 };
 
@@ -26,11 +28,13 @@ export function TabNavigator() {
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textMuted,
         tabBarIcon: ({ color, size }) => {
-          let iconName = "circle";
+          let iconName: keyof typeof Feather.glyphMap = "circle";
           if (route.name === "Dashboard") {
             iconName = "grid";
           } else if (route.name === "Historico") {
             iconName = "clock";
+          } else if (route.name === "CustoFixo") {
+            iconName = "dollar-sign";
           } else if (route.name === "Configuracoes") {
             iconName = "settings";
           }
@@ -44,6 +48,11 @@ export function TabNavigator() {
         name="Historico"
         component={TransactionsScreen}
         options={{ title: "Historico" }}
+      />
+      <Tab.Screen
+        name="CustoFixo"
+        component={FixedCostsScreen}
+        options={{ title: "Custo Fixo" }}
       />
       <Tab.Screen
         name="Configuracoes"

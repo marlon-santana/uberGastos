@@ -40,6 +40,7 @@ export function DashboardCharts({ income, expense, netProfit }: DashboardChartsP
           height={220}
           fromZero
           yAxisLabel="R$ "
+          yAxisSuffix=""
           chartConfig={chartConfig}
           style={styles.chart}
           showValuesOnTopOfBars
@@ -47,7 +48,7 @@ export function DashboardCharts({ income, expense, netProfit }: DashboardChartsP
       </Card>
 
       <Card>
-        <Text style={styles.title}>Lucro Líquido</Text>
+        <Text style={styles.title}>Lucro Lï¿½quido</Text>
         <LineChart
           data={{
             labels: ['Atual'],

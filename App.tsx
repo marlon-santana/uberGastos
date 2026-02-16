@@ -3,6 +3,7 @@ import { StatusBar } from "expo-status-bar";
 import { ActivityIndicator, View, StyleSheet } from "react-native";
 import { DashboardProvider } from "@/features/dashboard/context";
 import { TransactionsProvider } from "@/features/transactions/context";
+import { FixedCostsProvider } from "@/features/fixedCosts/context";
 import { WelcomeProvider } from "@/features/welcome/context";
 import { AppNavigator } from "@/navigation";
 import { useLoadFonts } from "@/shared/hooks/useLoadFonts";
@@ -22,10 +23,12 @@ export default function App() {
   return (
     <WelcomeProvider>
       <TransactionsProvider>
-        <DashboardProvider>
-          <AppNavigator />
-          <StatusBar style="light" />
-        </DashboardProvider>
+        <FixedCostsProvider>
+          <DashboardProvider>
+            <AppNavigator />
+            <StatusBar style="light" />
+          </DashboardProvider>
+        </FixedCostsProvider>
       </TransactionsProvider>
     </WelcomeProvider>
   );
