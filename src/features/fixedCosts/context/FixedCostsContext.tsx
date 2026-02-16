@@ -38,16 +38,20 @@ export function FixedCostsProvider({ children }: PropsWithChildren) {
   }, []);
 
   const addFixedCost = useCallback(async (input: FixedCostInput) => {
-    const next = [FixedCostFactory.create(input), ...fixedCosts];
-    await storageService.save(next);
-    setFixedCosts(next);
-  }, [fixedCosts]);
+    setFixedCosts(prev => {
+      const next = [FixedCostFactory.create(input), ...prev];
+      storageService.save(next);
+      return next;
+    });
+  }, []);
 
   const deleteFixedCost = useCallback(async (id: string) => {
-    const next = fixedCosts.filter(cost => cost.id !== id);
-    await storageService.save(next);
-    setFixedCosts(next);
-  }, [fixedCosts]);
+    setFixedCosts(prev => {
+      const next = prev.filter(cost => cost.id !== id);
+      storageService.save(next);
+      return next;
+    });
+  }, []);
 
   const totalDailyAmount = useMemo(() => {
     return fixedCosts.reduce((sum, cost) => sum + cost.dailyAmount, 0);
