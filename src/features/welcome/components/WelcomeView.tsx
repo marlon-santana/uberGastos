@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { FlatList, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { WelcomeFactory } from '@/features/welcome/factory/WelcomeFactory';
 import { WelcomeMessageStrategy } from '@/features/welcome/strategies/WelcomeMessageStrategy';
@@ -28,19 +28,16 @@ export function WelcomeView({ onStart }: WelcomeViewProps) {
 
       <View style={styles.benefitsSection}>
         <Text style={styles.sectionTitle}>Por que usar?</Text>
-        <FlatList
-          data={benefits}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.benefitsContainer}
-          renderItem={({ item }) => (
-            <View style={styles.benefitRow}>
+        <View style={styles.benefitsContainer}>
+          {benefits.map((item) => (
+            <View key={item.id} style={styles.benefitRow}>
               <View style={styles.checkIconContainer}>
                 <Feather name="check-circle" size={22} color={colors.primary} />
               </View>
               <Text style={styles.benefit}>{item.label}</Text>
             </View>
-          )}
-        />
+          ))}
+        </View>
       </View>
 
       <View style={styles.footer}>
