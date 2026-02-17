@@ -1,8 +1,8 @@
-import React from 'react';
-import { Dimensions, StyleSheet, Text, View } from 'react-native';
-import { BarChart, LineChart } from 'react-native-chart-kit';
-import { Card } from '@/shared/components';
-import { colors, spacing } from '@/shared/theme';
+import React from "react";
+import { Dimensions, StyleSheet, Text, View } from "react-native";
+import { BarChart, LineChart } from "react-native-chart-kit";
+import { Card } from "@/shared/components";
+import { colors, spacing } from "@/shared/theme";
 
 interface DashboardChartsProps {
   income: number;
@@ -10,7 +10,7 @@ interface DashboardChartsProps {
   netProfit: number;
 }
 
-const screenWidth = Dimensions.get('window').width;
+const screenWidth = Dimensions.get("window").width;
 
 const chartConfig = {
   backgroundGradientFrom: colors.surface,
@@ -20,11 +20,15 @@ const chartConfig = {
   labelColor: (opacity = 1) => `rgba(233, 244, 238, ${opacity})`,
   propsForBackgroundLines: {
     stroke: colors.border,
-    strokeDasharray: ''
-  }
+    strokeDasharray: "",
+  },
 };
 
-export function DashboardCharts({ income, expense, netProfit }: DashboardChartsProps) {
+export function DashboardCharts({
+  income,
+  expense,
+  netProfit,
+}: DashboardChartsProps) {
   const chartWidth = screenWidth - 64;
 
   return (
@@ -33,8 +37,8 @@ export function DashboardCharts({ income, expense, netProfit }: DashboardChartsP
         <Text style={styles.title}>Ganhos vs Despesas</Text>
         <BarChart
           data={{
-            labels: ['Ganhos', 'Despesas'],
-            datasets: [{ data: [income, expense] }]
+            labels: ["Ganhos", "Despesas"],
+            datasets: [{ data: [income, expense] }],
           }}
           width={chartWidth}
           height={220}
@@ -48,11 +52,11 @@ export function DashboardCharts({ income, expense, netProfit }: DashboardChartsP
       </Card>
 
       <Card>
-        <Text style={styles.title}>Lucro L�quido</Text>
+        <Text style={styles.title}>Lucro Liquido</Text>
         <LineChart
           data={{
-            labels: ['Atual'],
-            datasets: [{ data: [netProfit] }]
+            labels: ["Atual"],
+            datasets: [{ data: [netProfit] }],
           }}
           width={chartWidth}
           height={190}
@@ -70,15 +74,15 @@ export function DashboardCharts({ income, expense, netProfit }: DashboardChartsP
 const styles = StyleSheet.create({
   container: {
     gap: spacing.md,
-    marginBottom: 100
+    marginBottom: 100,
   },
   title: {
     color: colors.text,
     fontSize: 16,
-    fontWeight: '700',
-    marginBottom: spacing.sm
+    fontWeight: "700",
+    marginBottom: spacing.sm,
   },
   chart: {
-    borderRadius: 12
-  }
+    borderRadius: 12,
+  },
 });

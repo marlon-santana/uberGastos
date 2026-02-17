@@ -1,3 +1,8 @@
+export interface PaymentEntry {
+  date: string;
+  amount: number;
+}
+
 export interface FixedCost {
   id: string;
   value: number;
@@ -6,6 +11,7 @@ export interface FixedCost {
   daysToPayoff: number;
   dailyAmount: number;
   endDate: string;
+  payments: PaymentEntry[];
 }
 
 export interface FixedCostInput {
@@ -13,4 +19,5 @@ export interface FixedCostInput {
   description: string;
   startDate: string;
   daysToPayoff: number;
+  payments?: PaymentEntry[];
 }

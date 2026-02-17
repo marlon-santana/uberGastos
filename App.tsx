@@ -1,6 +1,7 @@
 import React, { useState } from "react";
+import { StyleSheet, ActivityIndicator, View } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import { ActivityIndicator, View, StyleSheet } from "react-native";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { DashboardProvider } from "@/features/dashboard/context";
 import { TransactionsProvider } from "@/features/transactions/context";
 import { FixedCostsProvider } from "@/features/fixedCosts/context";
@@ -14,23 +15,38 @@ export default function App() {
 
   if (!fontsLoaded) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#000" />
-      </View>
+      <SafeAreaProvider>
+        <SafeAreaView style={{ flex: 1 }}>
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#000" />
+          </View>
+        </SafeAreaView>
+      </SafeAreaProvider>
     );
   }
 
   return (
-    <WelcomeProvider>
-      <TransactionsProvider>
-        <FixedCostsProvider>
-          <DashboardProvider>
-            <AppNavigator />
-            <StatusBar style="light" />
-          </DashboardProvider>
-        </FixedCostsProvider>
-      </TransactionsProvider>
-    </WelcomeProvider>
+    <SafeAreaProvider>
+      <SafeAreaView
+        style={{ flex: 1 }}
+        edges={["top", "bottom", "left", "right"]}
+      >
+        <WelcomeProvider>
+          <TransactionsProvider>
+            <FixedCostsProvider>
+              <DashboardProvider>
+                <AppNavigator />
+                <StatusBar
+                  style="light"
+                  translucent
+                  backgroundColor="transparent"
+                />
+              </DashboardProvider>
+            </FixedCostsProvider>
+          </TransactionsProvider>
+        </WelcomeProvider>
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
 

@@ -1,16 +1,19 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from "react";
 import {
   Modal,
   Pressable,
   StyleSheet,
   Text,
   TextInput,
-  View
-} from 'react-native';
-import { PrimaryButton } from '@/shared/components';
-import { colors, radii, spacing } from '@/shared/theme';
-import { toISODate } from '@/shared/utils/format';
-import { TransactionInput, TransactionType } from '@/features/transactions/types/transaction';
+  View,
+} from "react-native";
+import { PrimaryButton } from "@/shared/components";
+import { colors, radii, spacing } from "@/shared/theme";
+import { toISODate } from "@/shared/utils/format";
+import {
+  TransactionInput,
+  TransactionType,
+} from "@/features/transactions/types/transaction";
 
 interface AddTransactionModalProps {
   visible: boolean;
@@ -18,21 +21,28 @@ interface AddTransactionModalProps {
   onSubmit: (type: TransactionType, data: TransactionInput) => Promise<void>;
 }
 
-export function AddTransactionModal({ visible, onClose, onSubmit }: AddTransactionModalProps) {
-  const [type, setType] = useState<TransactionType>('income');
-  const [amount, setAmount] = useState<string>('');
-  const [category, setCategory] = useState<string>('');
+export function AddTransactionModal({
+  visible,
+  onClose,
+  onSubmit,
+}: AddTransactionModalProps) {
+  const [type, setType] = useState<TransactionType>("income");
+  const [amount, setAmount] = useState<string>("");
+  const [category, setCategory] = useState<string>("");
   const [date, setDate] = useState<string>(toISODate());
-  const [description, setDescription] = useState<string>('');
+  const [description, setDescription] = useState<string>("");
 
-  const canSubmit = useMemo(() => Number(amount) > 0 && category.trim().length > 0, [amount, category]);
+  const canSubmit = useMemo(
+    () => Number(amount) > 0 && category.trim().length > 0,
+    [amount, category],
+  );
 
   const reset = useCallback(() => {
-    setType('income');
-    setAmount('');
-    setCategory('');
+    setType("income");
+    setAmount("");
+    setCategory("");
     setDate(toISODate());
-    setDescription('');
+    setDescription("");
   }, []);
 
   const handleSubmit = useCallback(async () => {
@@ -44,24 +54,51 @@ export function AddTransactionModal({ visible, onClose, onSubmit }: AddTransacti
       amount: Number(amount),
       category: category.trim(),
       date,
-      description
+      description,
     });
 
     reset();
     onClose();
-  }, [canSubmit, onSubmit, type, amount, category, date, description, reset, onClose]);
+  }, [
+    canSubmit,
+    onSubmit,
+    type,
+    amount,
+    category,
+    date,
+    description,
+    reset,
+    onClose,
+  ]);
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="slide"
+      onRequestClose={onClose}
+    >
       <View style={styles.backdrop}>
         <View style={styles.sheet}>
-          <Text style={styles.title}>Novo Lançamento</Text>
+          <Text style={styles.title}>Novo LanÃ§amento</Text>
 
           <View style={styles.typeRow}>
-            <Pressable style={[styles.typeButton, type === 'income' && styles.typeButtonActive]} onPress={() => setType('income')}>
+            <Pressable
+              style={[
+                styles.typeButton,
+                type === "income" && styles.typeButtonActive,
+              ]}
+              onPress={() => setType("income")}
+            >
               <Text style={styles.typeText}>Ganho</Text>
             </Pressable>
-            <Pressable style={[styles.typeButton, type === 'expense' && styles.typeButtonExpense]} onPress={() => setType('expense')}>
+            <Pressable
+              style={[
+                styles.typeButton,
+                type === "expense" && styles.typeButtonExpense,
+              ]}
+              onPress={() => setType("expense")}
+            >
               <Text style={styles.typeText}>Despesa</Text>
             </Pressable>
           </View>
@@ -89,14 +126,14 @@ export function AddTransactionModal({ visible, onClose, onSubmit }: AddTransacti
             style={styles.input}
           />
           <TextInput
-            placeholder="Descrição (opcional)"
+            placeholder="DescriÃ§o (opcional)"
             placeholderTextColor={colors.textMuted}
             value={description}
             onChangeText={setDescription}
             style={styles.input}
           />
 
-          <PrimaryButton label="Adicionar Lançamento" onPress={handleSubmit} />
+          <PrimaryButton label="Adicionar LanÃ§amento" onPress={handleSubmit} />
           <Pressable onPress={onClose} style={styles.cancelButton}>
             <Text style={styles.cancelText}>Cancelar</Text>
           </Pressable>
@@ -109,26 +146,26 @@ export function AddTransactionModal({ visible, onClose, onSubmit }: AddTransacti
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    justifyContent: 'flex-end'
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
+    justifyContent: "flex-end",
   },
   sheet: {
     backgroundColor: colors.surface,
     padding: spacing.lg,
     borderTopLeftRadius: radii.lg,
     borderTopRightRadius: radii.lg,
-    gap: spacing.sm
+    gap: spacing.sm,
   },
   title: {
     color: colors.text,
     fontSize: 20,
-    fontWeight: '700',
-    marginBottom: spacing.sm
+    fontWeight: "700",
+    marginBottom: spacing.sm,
   },
   typeRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: spacing.sm,
-    marginBottom: spacing.xs
+    marginBottom: spacing.xs,
   },
   typeButton: {
     flex: 1,
@@ -137,17 +174,17 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
     paddingVertical: spacing.sm,
-    alignItems: 'center'
+    alignItems: "center",
   },
   typeButtonActive: {
-    backgroundColor: colors.success
+    backgroundColor: colors.success,
   },
   typeButtonExpense: {
-    backgroundColor: colors.danger
+    backgroundColor: colors.danger,
   },
   typeText: {
     color: colors.text,
-    fontWeight: '600'
+    fontWeight: "600",
   },
   input: {
     borderRadius: radii.md,
@@ -156,14 +193,14 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surfaceAlt,
     color: colors.text,
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm
+    paddingVertical: spacing.sm,
   },
   cancelButton: {
-    alignItems: 'center',
-    paddingVertical: spacing.sm
+    alignItems: "center",
+    paddingVertical: spacing.sm,
   },
   cancelText: {
     color: colors.textMuted,
-    fontWeight: '600'
-  }
+    fontWeight: "600",
+  },
 });

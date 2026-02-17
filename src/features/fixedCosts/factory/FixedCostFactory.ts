@@ -1,4 +1,4 @@
-import { FixedCost, FixedCostInput } from '@/features/fixedCosts/types';
+import { FixedCost, FixedCostInput } from "@/features/fixedCosts/types";
 
 export class FixedCostFactory {
   static create(input: FixedCostInput): FixedCost {
@@ -14,7 +14,8 @@ export class FixedCostFactory {
       startDate: input.startDate,
       daysToPayoff: input.daysToPayoff,
       dailyAmount,
-      endDate: endDate.toISOString().split('T')[0]
+      endDate: endDate.toISOString().split("T")[0],
+      payments: input.payments ?? [],
     };
   }
 }
