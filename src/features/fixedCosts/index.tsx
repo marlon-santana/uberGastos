@@ -6,7 +6,7 @@ import { Card, FloatingActionButton } from '@/shared/components';
 import { colors, spacing } from '@/shared/theme';
 
 export default function FixedCostsScreen() {
-  const { fixedCosts, loading, addFixedCost, deleteFixedCost, totalDailyAmount } = useFixedCosts();
+  const { fixedCosts, loading, addFixedCost, deleteFixedCost, resetFixedCostPayments, totalDailyAmount } = useFixedCosts();
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
 
   if (loading) {
@@ -30,7 +30,7 @@ export default function FixedCostsScreen() {
       </View>
 
       <View style={styles.content}>
-        <FixedCostsList costs={fixedCosts} onDelete={deleteFixedCost} />
+        <FixedCostsList costs={fixedCosts} onDelete={deleteFixedCost} onReset={resetFixedCostPayments} />
       </View>
 
       <FloatingActionButton onPress={() => setModalOpen(true)} />

@@ -16,6 +16,7 @@ interface FixedCostsContextValue {
   addFixedCost: (input: FixedCostInput) => Promise<void>;
   deleteFixedCost: (id: string) => Promise<void>;
   addPaymentToFixedCost: (id: string, amount: number) => Promise<void>;
+  resetFixedCostPayments: (id: string) => Promise<void>;
   totalDailyAmount: number;
 }
 
@@ -91,6 +92,23 @@ export function FixedCostsProvider({ children }: PropsWithChildren) {
     });
   }, []);
 
+  const resetFixedCostPayments = useCallback(async (id: string) => {
+    setFixedCosts((prev) => {
+      const next = prev.map((cost) => {
+        if (cost.id !== id) return cost;
+        // Recalcular o valor diário original
+        const dailyAmount = cost.value / cost.daysToPayoff;
+        return {
+          ...cost,
+          payments: [],
+          dailyAmount,
+        };
+      });
+      storageService.save(next);
+      return next;
+    });
+  }, []);
+
   const totalDailyAmount = useMemo(() => {
     return fixedCosts.reduce((sum, cost) => sum + cost.dailyAmount, 0);
   }, [fixedCosts]);
@@ -102,6 +120,7 @@ export function FixedCostsProvider({ children }: PropsWithChildren) {
       addFixedCost,
       deleteFixedCost,
       addPaymentToFixedCost,
+      resetFixedCostPayments,
       totalDailyAmount,
     }),
     [
@@ -110,6 +129,7 @@ export function FixedCostsProvider({ children }: PropsWithChildren) {
       addFixedCost,
       deleteFixedCost,
       addPaymentToFixedCost,
+      resetFixedCostPayments,
       totalDailyAmount,
     ],
   );

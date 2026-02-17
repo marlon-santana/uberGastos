@@ -16,9 +16,10 @@ import { useFixedCosts } from "@/features/fixedCosts/hooks";
 interface FixedCostsListProps {
   costs: FixedCost[];
   onDelete: (id: string) => void;
+  onReset: (id: string) => void;
 }
 
-export function FixedCostsList({ costs, onDelete }: FixedCostsListProps) {
+export function FixedCostsList({ costs, onDelete, onReset }: FixedCostsListProps) {
   const [paymentInputs, setPaymentInputs] = useState<{ [id: string]: string }>(
     {},
   );
@@ -53,13 +54,14 @@ export function FixedCostsList({ costs, onDelete }: FixedCostsListProps) {
         const totalPaid =
           item.payments?.reduce((sum, p) => sum + p.amount, 0) || 0;
         const remaining = item.value - totalPaid;
+        const isFullyPaid = totalPaid >= item.value;
         const daysLeft = Math.max(
           item.daysToPayoff - (item.payments?.length || 0),
           1,
         );
         const dailyValue = remaining / daysLeft;
         return (
-          <Card>
+          <Card style={isFullyPaid ? styles.fullyPaidCard : undefined}>
             <View style={styles.itemHeader}>
               <View style={styles.itemInfo}>
                 <Text style={styles.description}>{item.description}</Text>
@@ -74,13 +76,28 @@ export function FixedCostsList({ costs, onDelete }: FixedCostsListProps) {
                     Pago: R$ {totalPaid.toFixed(2)}
                   </Text>
                 )}
+                {isFullyPaid && (
+                  <Text style={styles.fullyPaidText}>
+                    ✓ Totalmente Pago
+                  </Text>
+                )}
               </View>
-              <Pressable
-                onPress={() => onDelete(item.id)}
-                style={styles.deleteButton}
-              >
-                <Feather name="trash-2" size={20} color="#FF5C5C" />
-              </Pressable>
+              <View style={styles.actionButtons}>
+                {isFullyPaid && (
+                  <Pressable
+                    onPress={() => onReset(item.id)}
+                    style={styles.resetButton}
+                  >
+                    <Feather name="rotate-ccw" size={20} color={colors.primary} />
+                  </Pressable>
+                )}
+                <Pressable
+                  onPress={() => onDelete(item.id)}
+                  style={styles.deleteButton}
+                >
+                  <Feather name="trash-2" size={20} color="#FF5C5C" />
+                </Pressable>
+              </View>
             </View>
             <View style={styles.divider} />
             <View style={styles.itemDetails}>
@@ -136,6 +153,10 @@ const styles = StyleSheet.create({
   list: {
     gap: spacing.md,
   },
+  fullyPaidCard: {
+    borderWidth: 2,
+    borderColor: colors.success,
+  },
   emptyText: {
     color: colors.text,
     fontSize: 16,
@@ -173,6 +194,23 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginTop: 2,
   },
+  fullyPaidText: {
+    color: colors.success,
+    fontSize: 14,
+    fontWeight: "700",
+    marginTop: 4,
+  },
+  actionButtons: {
+    flexDirection: "row",
+    gap: spacing.xs,
+    alignItems: "center",
+  },
+  resetButton: {
+    padding: spacing.xs,
+  },
+  deleteButton: {
+    padding: spacing.xs,
+  },
   paymentInputRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -200,9 +238,6 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "700",
     fontSize: 14,
-  },
-  deleteButton: {
-    padding: spacing.xs,
   },
   divider: {
     height: 1,

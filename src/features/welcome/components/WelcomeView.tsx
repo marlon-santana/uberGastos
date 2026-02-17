@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
+import { Feather } from '@expo/vector-icons';
 import { WelcomeFactory } from '@/features/welcome/factory/WelcomeFactory';
 import { WelcomeMessageStrategy } from '@/features/welcome/strategies/WelcomeMessageStrategy';
 import { PrimaryButton } from '@/shared/components';
@@ -15,21 +16,36 @@ export function WelcomeView({ onStart }: WelcomeViewProps) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{strategy.getTitle()}</Text>
+      <View style={styles.header}>
+        <View style={styles.iconContainer}>
+          <Feather name="dollar-sign" size={48} color={colors.primary} />
+        </View>
+        <Text style={styles.title}>{strategy.getTitle()}</Text>
+        <Text style={styles.subtitle}>
+          Seu aplicativo de controle financeiro para motoristas de aplicativo
+        </Text>
+      </View>
 
-      <FlatList
-        data={benefits}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.benefitsContainer}
-        renderItem={({ item }) => (
-          <View style={styles.benefitRow}>
-            <Text style={styles.bullet}>•</Text>
-            <Text style={styles.benefit}>{item.label}</Text>
-          </View>
-        )}
-      />
+      <View style={styles.benefitsSection}>
+        <Text style={styles.sectionTitle}>Por que usar?</Text>
+        <FlatList
+          data={benefits}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.benefitsContainer}
+          renderItem={({ item }) => (
+            <View style={styles.benefitRow}>
+              <View style={styles.checkIconContainer}>
+                <Feather name="check-circle" size={22} color={colors.primary} />
+              </View>
+              <Text style={styles.benefit}>{item.label}</Text>
+            </View>
+          )}
+        />
+      </View>
 
-      <PrimaryButton label="Comecar Agora" onPress={onStart} />
+      <View style={styles.footer}>
+        <PrimaryButton label="ComeÃ§ar Agora" onPress={onStart} />
+      </View>
     </View>
   );
 }
@@ -38,34 +54,77 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-    padding: spacing.lg,
-    justifyContent: 'space-between'
+  },
+  header: {
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.xl * 2,
+    alignItems: 'center',
+    marginBottom: spacing.xl
+  },
+  iconContainer: {
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    backgroundColor: colors.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: spacing.lg,
+    borderWidth: 2,
+    borderColor: colors.primary,
   },
   title: {
     color: colors.text,
-    fontSize: 26,
+    fontSize: 32,
+    fontWeight: '800',
+    textAlign: 'center',
+    marginBottom: spacing.sm,
+  },
+  subtitle: {
+    color: colors.textMuted,
+    fontSize: 16,
+    textAlign: 'center',
+    lineHeight: 24,
+    paddingHorizontal: spacing.md,
+  },
+  benefitsSection: {
+    flex: 1,
+    paddingHorizontal: spacing.lg,
+  },
+  sectionTitle: {
+    color: colors.text,
+    fontSize: 20,
     fontWeight: '700',
-    lineHeight: 34,
-    marginTop: spacing.lg
+    marginBottom: spacing.md,
   },
   benefitsContainer: {
-    paddingVertical: spacing.lg,
-    gap: spacing.sm
+    gap: spacing.md,
   },
   benefitRow: {
     flexDirection: 'row',
-    gap: spacing.sm
+    alignItems: 'center',
+    gap: spacing.md,
+    backgroundColor: colors.surface,
+    padding: spacing.md,
+    borderRadius: 12,
+    borderLeftWidth: 3,
+    borderLeftColor: colors.primary,
   },
-  bullet: {
-    color: colors.primary,
-    fontSize: 18,
-    lineHeight: 20,
-    marginTop: 2
+  checkIconContainer: {
+    width: 28,
+    height: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   benefit: {
     flex: 1,
     color: colors.text,
     fontSize: 15,
-    lineHeight: 22
+    lineHeight: 22,
+    fontWeight: '500',
+  },
+  footer: {
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.xl,
+    paddingTop: spacing.md,
   }
 });

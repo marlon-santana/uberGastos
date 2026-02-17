@@ -24,6 +24,18 @@ const chartConfig = {
   },
 };
 
+const lineChartConfig = {
+  backgroundGradientFrom: colors.surface,
+  backgroundGradientTo: colors.surface,
+  decimalPlaces: 0,
+  color: (opacity = 1) => `rgba(77, 208, 138, ${opacity})`,
+  labelColor: (opacity = 1) => `rgba(233, 244, 238, ${opacity})`,
+  propsForBackgroundLines: {
+    stroke: colors.border,
+    strokeDasharray: "",
+  },
+};
+
 export function DashboardCharts({
   income,
   expense,
@@ -38,7 +50,15 @@ export function DashboardCharts({
         <BarChart
           data={{
             labels: ["Ganhos", "Despesas"],
-            datasets: [{ data: [income, expense] }],
+            datasets: [
+              { 
+                data: [income, expense],
+                colors: [
+                  (opacity = 1) => `rgba(77, 208, 138, ${opacity})`, // Green for income
+                  (opacity = 1) => `rgba(255, 92, 92, ${opacity})`,   // Red for expense
+                ]
+              }
+            ],
           }}
           width={chartWidth}
           height={220}
@@ -48,6 +68,7 @@ export function DashboardCharts({
           chartConfig={chartConfig}
           style={styles.chart}
           showValuesOnTopOfBars
+          withCustomBarColorFromData
         />
       </Card>
 
@@ -62,7 +83,7 @@ export function DashboardCharts({
           height={190}
           yAxisLabel="R$ "
           fromZero
-          chartConfig={chartConfig}
+          chartConfig={lineChartConfig}
           bezier
           style={styles.chart}
         />
