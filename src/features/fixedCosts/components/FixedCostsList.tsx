@@ -87,6 +87,7 @@ export function FixedCostsList({ costs, onDelete, onReset }: FixedCostsListProps
                   <Pressable
                     onPress={() => onReset(item.id)}
                     style={styles.resetButton}
+                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                   >
                     <Feather name="rotate-ccw" size={20} color={colors.primary} />
                   </Pressable>
@@ -94,6 +95,7 @@ export function FixedCostsList({ costs, onDelete, onReset }: FixedCostsListProps
                 <Pressable
                   onPress={() => onDelete(item.id)}
                   style={styles.deleteButton}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 >
                   <Feather name="trash-2" size={20} color="#FF5C5C" />
                 </Pressable>
@@ -206,10 +208,22 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   resetButton: {
-    padding: spacing.xs,
+    padding: spacing.sm,
+    backgroundColor: colors.surface,
+    borderRadius: 8,
+    minWidth: 40,
+    minHeight: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   deleteButton: {
-    padding: spacing.xs,
+    padding: spacing.sm,
+    backgroundColor: colors.surface,
+    borderRadius: 8,
+    minWidth: 40,
+    minHeight: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   paymentInputRow: {
     flexDirection: "row",

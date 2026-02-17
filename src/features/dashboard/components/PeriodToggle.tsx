@@ -14,14 +14,16 @@ export function PeriodToggle({ selected, onChange }: PeriodToggleProps) {
       <Pressable
         style={[styles.option, selected === 'weekly' && styles.active]}
         onPress={() => onChange('weekly')}
+        hitSlop={{ top: 5, bottom: 5, left: 5, right: 5 }}
       >
-        <Text style={styles.label}>Semanal</Text>
+        <Text style={[styles.label, selected === 'weekly' && styles.activeLabel]}>Semanal</Text>
       </Pressable>
       <Pressable
         style={[styles.option, selected === 'monthly' && styles.active]}
         onPress={() => onChange('monthly')}
+        hitSlop={{ top: 5, bottom: 5, left: 5, right: 5 }}
       >
-        <Text style={styles.label}>Mensal</Text>
+        <Text style={[styles.label, selected === 'monthly' && styles.activeLabel]}>Mensal</Text>
       </Pressable>
     </View>
   );
@@ -49,5 +51,8 @@ const styles = StyleSheet.create({
   label: {
     color: colors.text,
     fontWeight: '600'
+  },
+  activeLabel: {
+    color: '#0B1110'
   }
 });
