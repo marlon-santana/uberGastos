@@ -25,8 +25,8 @@ export function TabNavigator() {
         tabBarStyle: {
           backgroundColor: colors.surface,
           borderTopColor: colors.border,
-          paddingBottom: Platform.OS === 'ios' ? 20 : 8,
-          height: Platform.OS === 'ios' ? 88 : 68,
+          paddingBottom: Platform.OS === "ios" ? 32 : 20, // aumenta o padding para evitar sobreposição
+          height: Platform.OS === "ios" ? 100 : 80, // aumenta a altura para acomodar o padding extra
           borderTopWidth: 1,
         },
         tabBarActiveTintColor: colors.primary,
@@ -36,7 +36,7 @@ export function TabNavigator() {
         },
         tabBarLabelStyle: {
           fontSize: 12,
-          fontWeight: '600',
+          fontWeight: "600",
         },
         tabBarIcon: ({ color, size }) => {
           let iconName: keyof typeof Feather.glyphMap = "circle";
