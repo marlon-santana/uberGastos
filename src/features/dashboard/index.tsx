@@ -56,7 +56,13 @@ export default function DashboardScreen() {
 
         <PeriodToggle selected={period} onChange={setPeriod} />
 
-        <DashboardCharts income={metrics.income} expense={metrics.expense} netProfit={metrics.netProfit} />
+        <DashboardCharts 
+          income={metrics.income} 
+          expense={metrics.expense} 
+          netProfit={metrics.netProfit}
+          transactions={filteredTransactions}
+          period={period}
+        />
       </ScrollView>
 
       <FloatingActionButton onPress={() => setModalOpen(true)} />

@@ -1,16 +1,17 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from "react";
 import {
   Modal,
   Pressable,
   StyleSheet,
   Text,
   TextInput,
-  View
-} from 'react-native';
-import { PrimaryButton } from '@/shared/components';
-import { colors, radii, spacing } from '@/shared/theme';
-import { toISODate } from '@/shared/utils/format';
-import { FixedCostInput } from '@/features/fixedCosts/types';
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { PrimaryButton } from "@/shared/components";
+import { colors, radii, spacing } from "@/shared/theme";
+import { toISODate } from "@/shared/utils/format";
+import { FixedCostInput } from "@/features/fixedCosts/types";
 
 interface AddFixedCostModalProps {
   visible: boolean;
@@ -18,23 +19,29 @@ interface AddFixedCostModalProps {
   onSubmit: (data: FixedCostInput) => Promise<void>;
 }
 
-export function AddFixedCostModal({ visible, onClose, onSubmit }: AddFixedCostModalProps) {
-  const [value, setValue] = useState<string>('');
-  const [description, setDescription] = useState<string>('');
+export function AddFixedCostModal({
+  visible,
+  onClose,
+  onSubmit,
+}: AddFixedCostModalProps) {
+  const [value, setValue] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
   const [startDate, setStartDate] = useState<string>(toISODate());
-  const [daysToPayoff, setDaysToPayoff] = useState<string>('');
+  const [daysToPayoff, setDaysToPayoff] = useState<string>("");
 
   const canSubmit = useMemo(() => {
-    return Number(value) > 0 && 
-           description.trim().length > 0 && 
-           Number(daysToPayoff) > 0;
+    return (
+      Number(value) > 0 &&
+      description.trim().length > 0 &&
+      Number(daysToPayoff) > 0
+    );
   }, [value, description, daysToPayoff]);
 
   const reset = useCallback(() => {
-    setValue('');
-    setDescription('');
+    setValue("");
+    setDescription("");
     setStartDate(toISODate());
-    setDaysToPayoff('');
+    setDaysToPayoff("");
   }, []);
 
   const handleSubmit = useCallback(async () => {
@@ -46,17 +53,31 @@ export function AddFixedCostModal({ visible, onClose, onSubmit }: AddFixedCostMo
       value: Number(value),
       description: description.trim(),
       startDate,
-      daysToPayoff: Number(daysToPayoff)
+      daysToPayoff: Number(daysToPayoff),
     });
 
     reset();
     onClose();
-  }, [canSubmit, onSubmit, value, description, startDate, daysToPayoff, reset, onClose]);
+  }, [
+    canSubmit,
+    onSubmit,
+    value,
+    description,
+    startDate,
+    daysToPayoff,
+    reset,
+    onClose,
+  ]);
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="slide"
+      onRequestClose={onClose}
+    >
       <View style={styles.backdrop}>
-        <View style={styles.sheet}>
+        <SafeAreaView style={styles.sheet} edges={["bottom"]}>
           <Text style={styles.title}>Novo Custo Fixo</Text>
 
           <TextInput
@@ -94,7 +115,7 @@ export function AddFixedCostModal({ visible, onClose, onSubmit }: AddFixedCostMo
           <Pressable onPress={onClose} style={styles.cancelButton}>
             <Text style={styles.cancelText}>Cancelar</Text>
           </Pressable>
-        </View>
+        </SafeAreaView>
       </View>
     </Modal>
   );
@@ -103,21 +124,21 @@ export function AddFixedCostModal({ visible, onClose, onSubmit }: AddFixedCostMo
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    justifyContent: 'flex-end'
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
+    justifyContent: "flex-end",
   },
   sheet: {
     backgroundColor: colors.surface,
     padding: spacing.lg,
     borderTopLeftRadius: radii.lg,
     borderTopRightRadius: radii.lg,
-    gap: spacing.sm
+    gap: spacing.sm,
   },
   title: {
     color: colors.text,
     fontSize: 20,
-    fontWeight: '700',
-    marginBottom: spacing.sm
+    fontWeight: "700",
+    marginBottom: spacing.sm,
   },
   input: {
     borderRadius: radii.md,
@@ -126,14 +147,14 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surfaceAlt,
     color: colors.text,
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm
+    paddingVertical: spacing.sm,
   },
   cancelButton: {
-    alignItems: 'center',
-    paddingVertical: spacing.sm
+    alignItems: "center",
+    paddingVertical: spacing.sm,
   },
   cancelText: {
     color: colors.textMuted,
-    fontWeight: '600'
-  }
+    fontWeight: "600",
+  },
 });
