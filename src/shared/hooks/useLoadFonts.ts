@@ -17,5 +17,6 @@ export function useLoadFonts(callback?: () => void) {
     }
     
     loadFonts();
-  }, [callback]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 }
