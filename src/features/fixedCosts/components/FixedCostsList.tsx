@@ -56,6 +56,9 @@ export function FixedCostsList({
       keyExtractor={(item) => item.id}
       contentContainerStyle={styles.list}
       keyboardShouldPersistTaps="handled"
+      keyboardDismissMode="on-drag"
+      nestedScrollEnabled={true}
+      removeClippedSubviews={false}
       renderItem={({ item }) => {
         // Calcular total já pago
         const totalPaid =
@@ -134,11 +137,14 @@ export function FixedCostsList({
                 <TextInput
                   style={styles.paymentInput}
                   placeholder="Lançar pagamento (R$)"
+                  placeholderTextColor={colors.textMuted}
                   keyboardType="decimal-pad"
                   value={paymentInputs[item.id] || ""}
                   onChangeText={(text) =>
                     setPaymentInputs((prev) => ({ ...prev, [item.id]: text }))
                   }
+                  returnKeyType="done"
+                  blurOnSubmit={false}
                 />
                 <Pressable
                   style={styles.paymentButton}

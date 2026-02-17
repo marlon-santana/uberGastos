@@ -4,15 +4,18 @@ import { Feather } from "@expo/vector-icons";
 
 export function useLoadFonts(callback?: () => void) {
   useEffect(() => {
-    Font.loadAsync({
-      ...Feather.font,
-    })
-      .then(() => {
+    async function loadFonts() {
+      try {
+        await Font.loadAsync({
+          ...Feather.font,
+        });
         if (callback) callback();
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error("Erro ao carregar fontes:", error);
         if (callback) callback(); // Garante que o app não fique preso
-      });
-  }, []);
+      }
+    }
+    
+    loadFonts();
+  }, [callback]);
 }
