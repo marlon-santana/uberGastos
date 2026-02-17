@@ -69,13 +69,18 @@ export function DashboardCharts({
       const today = new Date().toISOString().split('T')[0];
       return {
         labels: [today.slice(5)], // Show MM-DD
-        data: [0]
+        data: [0],
+        hasNegativeValues: false
       };
     }
 
+    const data = recentDates.map(date => dataByDate.get(date) || 0);
+    const hasNegativeValues = data.some(value => value < 0);
+
     return {
       labels: recentDates.map(date => date.slice(5)), // Show MM-DD
-      data: recentDates.map(date => dataByDate.get(date) || 0)
+      data,
+      hasNegativeValues
     };
   }, [transactions, period]);
 
@@ -118,7 +123,7 @@ export function DashboardCharts({
           width={chartWidth}
           height={190}
           yAxisLabel="R$ "
-          fromZero={false}
+          fromZero={!dailyNetProfit.hasNegativeValues}
           chartConfig={lineChartConfig}
           bezier
           style={styles.chart}
