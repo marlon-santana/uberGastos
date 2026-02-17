@@ -1,0 +1,9 @@
+{
+  "settings.title": "Configuración",
+  "settings.language": "Idioma de la aplicación",
+  "settings.notification": "Las preferencias de notificación y personalización se agregarán aquí.",
+  "welcome.title": "Bienvenido",
+  "welcome.subtitle": "Tu aplicación de control financiero para conductores de apps",
+  "welcome.why": "¿Por qué usar?",
+  "welcome.start": "Comenzar ahora"
+}

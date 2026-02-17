@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import "@/shared/i18n";
 import { StyleSheet, ActivityIndicator, View } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
@@ -29,7 +30,7 @@ export default function App() {
     <SafeAreaProvider>
       <SafeAreaView
         style={{ flex: 1 }}
-        edges={["top", "left", "right"]}
+        edges={["top", "left", "right", "bottom"]}
       >
         <WelcomeProvider>
           <TransactionsProvider>

@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { formatDateBR } from '@/shared/utils';
+import { formatDecimal } from "@/shared/utils";
 import {
   FlatList,
   Pressable,
@@ -19,7 +21,11 @@ interface FixedCostsListProps {
   onReset: (id: string) => void;
 }
 
-export function FixedCostsList({ costs, onDelete, onReset }: FixedCostsListProps) {
+export function FixedCostsList({
+  costs,
+  onDelete,
+  onReset,
+}: FixedCostsListProps) {
   const [paymentInputs, setPaymentInputs] = useState<{ [id: string]: string }>(
     {},
   );
@@ -67,20 +73,18 @@ export function FixedCostsList({ costs, onDelete, onReset }: FixedCostsListProps
               <View style={styles.itemInfo}>
                 <Text style={styles.description}>{item.description}</Text>
                 <Text style={styles.value}>
-                  R$ {remaining.toFixed(2)}{" "}
+                  R$ {formatDecimal(remaining)}{" "}
                   <Text style={{ color: colors.textMuted, fontSize: 12 }}>
                     (restante)
                   </Text>
                 </Text>
                 {totalPaid > 0 && (
                   <Text style={styles.paidText}>
-                    Pago: R$ {totalPaid.toFixed(2)}
+                    Pago: R$ {formatDecimal(totalPaid)}
                   </Text>
                 )}
                 {isFullyPaid && (
-                  <Text style={styles.fullyPaidText}>
-                    ✓ Totalmente Pago
-                  </Text>
+                  <Text style={styles.fullyPaidText}>✓ Totalmente Pago</Text>
                 )}
               </View>
               <View style={styles.actionButtons}>
@@ -90,7 +94,11 @@ export function FixedCostsList({ costs, onDelete, onReset }: FixedCostsListProps
                     style={styles.resetButton}
                     hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                   >
-                    <Feather name="rotate-ccw" size={20} color={colors.primary} />
+                    <Feather
+                      name="rotate-ccw"
+                      size={20}
+                      color={colors.primary}
+                    />
                   </Pressable>
                 )}
                 <Pressable
@@ -106,11 +114,11 @@ export function FixedCostsList({ costs, onDelete, onReset }: FixedCostsListProps
             <View style={styles.itemDetails}>
               <View style={styles.detailRow}>
                 <Text style={styles.detailLabel}>Data inicial:</Text>
-                <Text style={styles.detailValue}>{item.startDate}</Text>
+                <Text style={styles.detailValue}>{formatDateBR(item.startDate)}</Text>
               </View>
               <View style={styles.detailRow}>
                 <Text style={styles.detailLabel}>Data final:</Text>
-                <Text style={styles.detailValue}>{item.endDate}</Text>
+                <Text style={styles.detailValue}>{formatDateBR(item.endDate)}</Text>
               </View>
               <View style={styles.detailRow}>
                 <Text style={styles.detailLabel}>Dias para pagar:</Text>
@@ -119,7 +127,7 @@ export function FixedCostsList({ costs, onDelete, onReset }: FixedCostsListProps
               <View style={[styles.detailRow, styles.highlightRow]}>
                 <Text style={styles.highlightLabel}>Valor diário:</Text>
                 <Text style={styles.highlightValue}>
-                  R$ {dailyValue.toFixed(2)}/dia
+                  R$ {formatDecimal(dailyValue)}/dia
                 </Text>
               </View>
               <View style={styles.paymentInputRow}>
@@ -214,8 +222,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     minWidth: 44,
     minHeight: 44,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     borderWidth: 1,
     borderColor: colors.primary,
   },
@@ -225,8 +233,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     minWidth: 44,
     minHeight: 44,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     borderWidth: 1,
     borderColor: colors.danger,
   },
