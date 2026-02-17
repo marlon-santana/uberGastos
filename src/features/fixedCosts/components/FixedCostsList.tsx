@@ -98,7 +98,7 @@ export function FixedCostsList({ costs, onDelete, onReset }: FixedCostsListProps
                   style={styles.deleteButton}
                   hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 >
-                  <Feather name="trash-2" size={20} color="#FF5C5C" />
+                  <Feather name="trash-2" size={20} color={colors.danger} />
                 </Pressable>
               </View>
             </View>
@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: '#FF5C5C',
+    borderColor: colors.danger,
   },
   paymentInputRow: {
     flexDirection: "row",
