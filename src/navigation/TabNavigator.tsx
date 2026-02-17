@@ -1,5 +1,6 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { Platform } from "react-native";
 import DashboardScreen from "@/features/dashboard";
 import TransactionsScreen from "@/features/transactions";
 import FixedCostsScreen from "@/features/fixedCosts";
@@ -24,9 +25,19 @@ export function TabNavigator() {
         tabBarStyle: {
           backgroundColor: colors.surface,
           borderTopColor: colors.border,
+          paddingBottom: Platform.OS === 'ios' ? 20 : 8,
+          height: Platform.OS === 'ios' ? 88 : 68,
+          borderTopWidth: 1,
         },
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textMuted,
+        tabBarIconStyle: {
+          marginTop: 4,
+        },
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: '600',
+        },
         tabBarIcon: ({ color, size }) => {
           let iconName: keyof typeof Feather.glyphMap = "circle";
           if (route.name === "Dashboard") {

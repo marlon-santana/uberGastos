@@ -29,7 +29,7 @@ export default function App() {
     <SafeAreaProvider>
       <SafeAreaView
         style={{ flex: 1 }}
-        edges={["top", "bottom", "left", "right"]}
+        edges={["top", "left", "right"]}
       >
         <WelcomeProvider>
           <TransactionsProvider>

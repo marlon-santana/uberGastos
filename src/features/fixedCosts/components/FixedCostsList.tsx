@@ -49,6 +49,7 @@ export function FixedCostsList({ costs, onDelete, onReset }: FixedCostsListProps
       data={costs}
       keyExtractor={(item) => item.id}
       contentContainerStyle={styles.list}
+      keyboardShouldPersistTaps="handled"
       renderItem={({ item }) => {
         // Calcular total já pago
         const totalPaid =
@@ -209,21 +210,25 @@ const styles = StyleSheet.create({
   },
   resetButton: {
     padding: spacing.sm,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.surfaceAlt,
     borderRadius: 8,
-    minWidth: 40,
-    minHeight: 40,
+    minWidth: 44,
+    minHeight: 44,
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: colors.primary,
   },
   deleteButton: {
     padding: spacing.sm,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.surfaceAlt,
     borderRadius: 8,
-    minWidth: 40,
-    minHeight: 40,
+    minWidth: 44,
+    minHeight: 44,
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#FF5C5C',
   },
   paymentInputRow: {
     flexDirection: "row",
