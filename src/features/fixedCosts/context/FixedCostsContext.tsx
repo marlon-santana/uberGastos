@@ -34,10 +34,17 @@ export function FixedCostsProvider({ children }: PropsWithChildren) {
     let mounted = true;
 
     const hydrate = async () => {
-      const stored = await storageService.load();
-      if (mounted) {
-        setFixedCosts(stored);
-        setLoading(false);
+      try {
+        const stored = await storageService.load();
+        if (mounted) {
+          setFixedCosts(stored);
+        }
+      } catch (error) {
+        console.error('Failed to hydrate fixed costs', error);
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
       }
     };
 

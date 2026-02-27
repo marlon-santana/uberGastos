@@ -7,6 +7,7 @@ interface TransactionsContextValue {
   transactions: Transaction[];
   loading: boolean;
   addTransaction: (type: TransactionType, input: TransactionInput) => Promise<void>;
+  clearTransactions: () => Promise<void>;
 }
 
 const TransactionsContext = createContext<TransactionsContextValue | undefined>(undefined);
@@ -21,10 +22,17 @@ export function TransactionsProvider({ children }: PropsWithChildren) {
     let mounted = true;
 
     const hydrate = async () => {
-      const stored = await storageService.load();
-      if (mounted) {
-        setTransactions(stored);
-        setLoading(false);
+      try {
+        const stored = await storageService.load();
+        if (mounted) {
+          setTransactions(stored);
+        }
+      } catch (error) {
+        console.error('Failed to load transactions', error);
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
       }
     };
 
@@ -41,13 +49,19 @@ export function TransactionsProvider({ children }: PropsWithChildren) {
     setTransactions(next);
   }, [transactions]);
 
+  const clearTransactions = useCallback(async () => {
+    await storageService.save([]);
+    setTransactions([]);
+  }, []);
+
   const value = useMemo(
     () => ({
       transactions,
       loading,
-      addTransaction
+      addTransaction,
+      clearTransactions
     }),
-    [transactions, loading, addTransaction]
+    [transactions, loading, addTransaction, clearTransactions]
   );
 
   return <TransactionsContext.Provider value={value}>{children}</TransactionsContext.Provider>;

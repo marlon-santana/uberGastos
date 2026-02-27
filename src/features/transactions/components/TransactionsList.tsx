@@ -1,4 +1,4 @@
-import React from 'react';
+ï»¿import React from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { Card } from '@/shared/components';
 import { colors, spacing } from '@/shared/theme';
@@ -15,12 +15,13 @@ export function TransactionsList({ transactions }: TransactionsListProps) {
       data={transactions}
       keyExtractor={(item) => item.id}
       contentContainerStyle={styles.content}
-      ListEmptyComponent={<Text style={styles.empty}>Nenhum lançamento ainda.</Text>}
+      ListEmptyComponent={<Text style={styles.empty}>Nenhum lancamento ainda.</Text>}
       renderItem={({ item }) => (
         <Card style={styles.item}>
           <View>
             <Text style={styles.category}>{item.category}</Text>
             <Text style={styles.meta}>{formatDate(item.date)}</Text>
+            <Text style={styles.meta}>Corridas: {item.ridesCount}</Text>
             {item.description ? <Text style={styles.meta}>{item.description}</Text> : null}
           </View>
           <Text style={[styles.amount, item.type === 'income' ? styles.income : styles.expense]}>

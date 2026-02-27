@@ -6,6 +6,8 @@ import {
   FixedCostsList,
 } from "@/features/fixedCosts/components";
 import { useFixedCosts } from "@/features/fixedCosts/hooks";
+import { useAds } from "@/features/ads/hooks";
+import { FixedAdBanner } from "@/features/ads/components";
 import { Card, FloatingActionButton } from "@/shared/components";
 import { colors, spacing } from "@/shared/theme";
 
@@ -18,6 +20,7 @@ export default function FixedCostsScreen() {
     resetFixedCostPayments,
     totalDailyAmount,
   } = useFixedCosts();
+  const { maybeShowInterstitial } = useAds();
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
 
   if (loading) {
@@ -27,6 +30,12 @@ export default function FixedCostsScreen() {
       </View>
     );
   }
+
+  const handleOpenModal = () => {
+    maybeShowInterstitial("fixed_costs_open_add_modal", () => {
+      setModalOpen(true);
+    });
+  };
 
   return (
     <View style={styles.container}>
@@ -51,7 +60,8 @@ export default function FixedCostsScreen() {
         />
       </View>
 
-      <FloatingActionButton onPress={() => setModalOpen(true)} />
+      <FixedAdBanner placement="fixed_costs_bottom" />
+      <FloatingActionButton onPress={handleOpenModal} />
       <AddFixedCostModal
         visible={isModalOpen}
         onClose={() => setModalOpen(false)}
@@ -96,5 +106,6 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: spacing.md,
+    paddingBottom: 110,
   },
 });

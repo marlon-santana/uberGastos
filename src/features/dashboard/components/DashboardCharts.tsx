@@ -1,11 +1,13 @@
 import React, { useMemo } from "react";
 import { Dimensions, StyleSheet, Text, View } from "react-native";
 import { formatDecimal } from "@/shared/utils";
+import { parseISODateLocal, toISODate } from "@/shared/utils/format";
 import { BarChart, LineChart } from "react-native-chart-kit";
 import { Card } from "@/shared/components";
 import { colors, spacing } from "@/shared/theme";
 import { Transaction } from "@/features/transactions/types";
 import { Period } from "@/shared/types/common";
+import { DailyRidesLineChart } from "@/features/dashboard/components/DailyRidesLineChart";
 
 interface DashboardChartsProps {
   income: number;
@@ -41,17 +43,13 @@ const lineChartConfig = {
   },
 };
 
-export function DashboardCharts({
-  income,
-  expense,
-  netProfit,
+export const DashboardCharts = React.memo(function DashboardCharts({
   transactions,
   period,
 }: DashboardChartsProps) {
   const chartWidth = screenWidth - 64;
 
-  // Helpers para labels
-  const weekDays = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+  const weekDays = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sab"];
   const months = [
     "Jan",
     "Fev",
@@ -67,82 +65,98 @@ export function DashboardCharts({
     "Dez",
   ];
 
-  // Agrupa ganhos e despesas por dia da semana atual ou mês do ano
   const groupedData = useMemo(() => {
     let labels: string[] = [];
-    let income: number[] = [];
-    let expense: number[] = [];
+    let groupedIncome: number[] = [];
+    let groupedExpense: number[] = [];
+    let workedDays: number[] = [];
+
     if (period === "weekly") {
-      // Pega o domingo da semana atual
       const now = new Date();
       now.setHours(0, 0, 0, 0);
       const dayOfWeek = now.getDay();
       const sunday = new Date(now);
       sunday.setDate(now.getDate() - dayOfWeek);
       sunday.setHours(0, 0, 0, 0);
-      // Monta datas da semana atual (YYYY-MM-DD)
-      const weekDates = Array.from({ length: 7 }, (_, i) => {
-        const d = new Date(sunday);
-        d.setDate(sunday.getDate() + i);
-        d.setHours(0, 0, 0, 0);
-        return d;
+
+      const weekDates = Array.from({ length: 7 }, (_, index) => {
+        const date = new Date(sunday);
+        date.setDate(sunday.getDate() + index);
+        date.setHours(0, 0, 0, 0);
+        return date;
       });
-      labels = weekDates.map((d) => weekDays[d.getDay()]);
-      income = weekDates.map((d) => {
-        const dateStr = d.toISOString().slice(0, 10);
-        return transactions
-          .filter((t) => t.type === "income" && t.date === dateStr)
-          .reduce((sum, t) => sum + t.amount, 0);
+
+      labels = weekDates.map((date) => weekDays[date.getDay()]);
+      groupedIncome = Array(7).fill(0);
+      groupedExpense = Array(7).fill(0);
+      const workedFlags = Array(7).fill(0);
+
+      const weekIndexByDate = new Map<string, number>();
+      weekDates.forEach((date, index) => {
+        weekIndexByDate.set(toISODate(date), index);
       });
-      expense = weekDates.map((d) => {
-        const dateStr = d.toISOString().slice(0, 10);
-        return transactions
-          .filter((t) => t.type === "expense" && t.date === dateStr)
-          .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+
+      transactions.forEach((transaction) => {
+        const weekIndex = weekIndexByDate.get(transaction.date);
+        if (weekIndex === undefined) {
+          return;
+        }
+
+        if (transaction.type === "income") {
+          groupedIncome[weekIndex] += transaction.amount;
+          workedFlags[weekIndex] = 1;
+        } else {
+          groupedExpense[weekIndex] += Math.abs(transaction.amount);
+        }
+      });
+
+      let accumulatedWorkedDays = 0;
+      workedDays = workedFlags.map((hasIncomeInDay) => {
+        if (hasIncomeInDay > 0) {
+          accumulatedWorkedDays += 1;
+        }
+        return accumulatedWorkedDays;
       });
     } else {
       const currentYear = new Date().getFullYear();
       labels = months;
-      income = months.map((m, idx) =>
-        transactions
-          .filter(
-            (t) =>
-              t.type === "income" &&
-              new Date(t.date).getMonth() === idx &&
-              new Date(t.date).getFullYear() === currentYear,
-          )
-          .reduce((sum, t) => sum + t.amount, 0),
-      );
-      expense = months.map((m, idx) =>
-        transactions
-          .filter(
-            (t) =>
-              t.type === "expense" &&
-              new Date(t.date).getMonth() === idx &&
-              new Date(t.date).getFullYear() === currentYear,
-          )
-          .reduce((sum, t) => sum + Math.abs(t.amount), 0),
-      );
+      groupedIncome = Array(12).fill(0);
+      groupedExpense = Array(12).fill(0);
+      const monthWorkedDaySets = Array.from({ length: 12 }, () => new Set<string>());
+
+      transactions.forEach((transaction) => {
+        const parsedDate = parseISODateLocal(transaction.date);
+        if (parsedDate.getFullYear() !== currentYear) {
+          return;
+        }
+
+        const monthIndex = parsedDate.getMonth();
+        if (transaction.type === "income") {
+          groupedIncome[monthIndex] += transaction.amount;
+          monthWorkedDaySets[monthIndex].add(transaction.date);
+        } else {
+          groupedExpense[monthIndex] += Math.abs(transaction.amount);
+        }
+      });
+
+      workedDays = monthWorkedDaySets.map((daysSet) => daysSet.size);
     }
-    return { labels, income, expense };
+
+    return { labels, income: groupedIncome, expense: groupedExpense, workedDays };
   }, [transactions, period]);
 
-  // Lucro líquido agrupado por período
   const netProfitData = useMemo(() => {
     if (period === "weekly") {
-      // Acumulado ao longo da semana
-      let acc = 0;
-      return groupedData.labels.map((_, idx) => {
-        acc += (groupedData.income[idx] || 0) - (groupedData.expense[idx] || 0);
-        return acc;
+      let accumulated = 0;
+      return groupedData.labels.map((_, index) => {
+        accumulated += (groupedData.income[index] || 0) - (groupedData.expense[index] || 0);
+        return accumulated;
       });
-    } else {
-      // Mensal: valor do mês
-      return groupedData.labels.map(
-        (_, idx) =>
-          (groupedData.income[idx] || 0) - (groupedData.expense[idx] || 0),
-      );
     }
+
+    return groupedData.labels.map(
+      (_, index) => (groupedData.income[index] || 0) - (groupedData.expense[index] || 0),
+    );
   }, [groupedData, period]);
 
   return (
@@ -158,14 +172,12 @@ export function DashboardCharts({
                 color: (opacity = 1) => `rgba(77, 208, 138, ${opacity})`,
               },
             ],
-            legend: ["Ganhos"],
           }}
           width={chartWidth}
           height={180}
           fromZero
           yAxisLabel="R$ "
           yAxisSuffix=""
-          formatYLabel={formatDecimal}
           chartConfig={chartConfig}
           style={styles.chart}
           showValuesOnTopOfBars
@@ -184,14 +196,12 @@ export function DashboardCharts({
                 color: (opacity = 1) => `rgba(255, 92, 92, ${opacity})`,
               },
             ],
-            legend: ["Despesas"],
           }}
           width={chartWidth}
           height={180}
           fromZero
           yAxisLabel="R$ "
           yAxisSuffix=""
-          formatYLabel={formatDecimal}
           chartConfig={{
             ...chartConfig,
             color: (opacity = 1) => `rgba(255, 92, 92, ${opacity})`,
@@ -203,13 +213,11 @@ export function DashboardCharts({
       </Card>
 
       <Card>
-        <Text style={styles.title}>Lucro Líquido</Text>
+        <Text style={styles.title}>Lucro liquido</Text>
         <LineChart
           data={{
             labels: groupedData.labels,
-            datasets: [
-              { data: netProfitData.length > 0 ? netProfitData : [0] },
-            ],
+            datasets: [{ data: netProfitData.length > 0 ? netProfitData : [0] }],
           }}
           width={chartWidth}
           height={190}
@@ -227,9 +235,34 @@ export function DashboardCharts({
           withHorizontalLines
         />
       </Card>
+
+      <Card>
+        <Text style={styles.title}>Dias trabalhados</Text>
+        <LineChart
+          data={{
+            labels: groupedData.labels,
+            datasets: [{ data: groupedData.workedDays.length > 0 ? groupedData.workedDays : [0] }],
+          }}
+          width={chartWidth}
+          height={190}
+          fromZero
+          chartConfig={{
+            ...lineChartConfig,
+            color: (opacity = 1) => `rgba(61, 169, 252, ${opacity})`,
+          }}
+          style={styles.chart}
+          withDots
+          withInnerLines
+          withOuterLines
+          withVerticalLines
+          withHorizontalLines
+        />
+      </Card>
+
+      <DailyRidesLineChart transactions={transactions} period={period} />
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   container: {

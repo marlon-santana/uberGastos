@@ -5,6 +5,7 @@ import DashboardScreen from "@/features/dashboard";
 import TransactionsScreen from "@/features/transactions";
 import FixedCostsScreen from "@/features/fixedCosts";
 import SettingsScreen from "@/screens/SettingsScreen";
+import { useAds } from "@/features/ads/hooks";
 import { colors } from "@/shared/theme";
 import { Feather } from "@expo/vector-icons";
 
@@ -18,6 +19,8 @@ export type RootTabParamList = {
 const Tab = createBottomTabNavigator<RootTabParamList>();
 
 export function TabNavigator() {
+  const { maybeShowInterstitial } = useAds();
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -54,21 +57,36 @@ export function TabNavigator() {
         },
       })}
     >
-      <Tab.Screen name="Dashboard" component={DashboardScreen} />
+      <Tab.Screen
+        name="Dashboard"
+        component={DashboardScreen}
+        listeners={{
+          tabPress: () => maybeShowInterstitial("tab_dashboard"),
+        }}
+      />
       <Tab.Screen
         name="Historico"
         component={TransactionsScreen}
         options={{ title: "Historico" }}
+        listeners={{
+          tabPress: () => maybeShowInterstitial("tab_historico"),
+        }}
       />
       <Tab.Screen
         name="CustoFixo"
         component={FixedCostsScreen}
         options={{ title: "Custo Fixo" }}
+        listeners={{
+          tabPress: () => maybeShowInterstitial("tab_custo_fixo"),
+        }}
       />
       <Tab.Screen
         name="Configuracoes"
         component={SettingsScreen}
         options={{ title: "Configuracoes" }}
+        listeners={{
+          tabPress: () => maybeShowInterstitial("tab_configuracoes"),
+        }}
       />
     </Tab.Navigator>
   );

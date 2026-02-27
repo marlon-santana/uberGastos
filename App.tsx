@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import "@/shared/i18n";
 import { StyleSheet, ActivityIndicator, View } from "react-native";
 import { StatusBar } from "expo-status-bar";
@@ -7,12 +7,12 @@ import { DashboardProvider } from "@/features/dashboard/context";
 import { TransactionsProvider } from "@/features/transactions/context";
 import { FixedCostsProvider } from "@/features/fixedCosts/context";
 import { WelcomeProvider } from "@/features/welcome/context";
+import { AdsProvider } from "@/features/ads/context";
 import { AppNavigator } from "@/navigation";
 import { useLoadFonts } from "@/shared/hooks/useLoadFonts";
 
 export default function App() {
-  const [fontsLoaded, setFontsLoaded] = useState(false);
-  useLoadFonts(() => setFontsLoaded(true));
+  const fontsLoaded = useLoadFonts();
 
   if (!fontsLoaded) {
     return (
@@ -33,18 +33,20 @@ export default function App() {
         edges={["top", "left", "right", "bottom"]}
       >
         <WelcomeProvider>
-          <TransactionsProvider>
-            <FixedCostsProvider>
-              <DashboardProvider>
-                <AppNavigator />
-                <StatusBar
-                  style="light"
-                  translucent
-                  backgroundColor="transparent"
-                />
-              </DashboardProvider>
-            </FixedCostsProvider>
-          </TransactionsProvider>
+          <AdsProvider>
+            <TransactionsProvider>
+              <FixedCostsProvider>
+                <DashboardProvider>
+                  <AppNavigator />
+                  <StatusBar
+                    style="light"
+                    translucent
+                    backgroundColor="transparent"
+                  />
+                </DashboardProvider>
+              </FixedCostsProvider>
+            </TransactionsProvider>
+          </AdsProvider>
         </WelcomeProvider>
       </SafeAreaView>
     </SafeAreaProvider>

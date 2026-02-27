@@ -4,6 +4,7 @@ export interface Transaction {
   id: string;
   type: TransactionType;
   amount: number;
+  ridesCount: number;
   category: string;
   date: string;
   description?: string;
@@ -11,6 +12,7 @@ export interface Transaction {
 
 export interface TransactionInput {
   amount: number;
+  ridesCount: number;
   category: string;
   date: string;
   description?: string;
