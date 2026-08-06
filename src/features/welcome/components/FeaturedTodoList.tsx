@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { WelcomeBenefit } from "@/features/welcome/types/welcome";
-import { colors, spacing } from "@/shared/theme";
+import { colors, font, radii, spacing } from "@/shared/theme";
 
 interface FeaturedTodoListProps {
   items: WelcomeBenefit[];
@@ -10,8 +10,7 @@ interface FeaturedTodoListProps {
 export function FeaturedTodoList({ items }: FeaturedTodoListProps) {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Featured</Text>
-      {/* Dedicated checklist component keeps the welcome view focused on layout orchestration. */}
+      <Text style={styles.title}>Por que usar?</Text>
       {items.map((item) => (
         <View key={item.id} style={styles.row}>
           <Text style={styles.emoji}>{item.emoji}</Text>
@@ -26,7 +25,7 @@ const styles = StyleSheet.create({
   container: {
     gap: spacing.sm,
     backgroundColor: colors.surface,
-    borderRadius: 12,
+    borderRadius: radii.md,
     padding: spacing.md,
     borderWidth: 1,
     borderColor: colors.border,
@@ -34,7 +33,7 @@ const styles = StyleSheet.create({
   title: {
     color: colors.text,
     fontSize: 18,
-    fontWeight: "700",
+    fontFamily: font.bold,
     marginBottom: spacing.xs,
   },
   row: {
@@ -48,6 +47,6 @@ const styles = StyleSheet.create({
   label: {
     color: colors.text,
     fontSize: 15,
-    fontWeight: "500",
+    fontFamily: font.medium,
   },
 });

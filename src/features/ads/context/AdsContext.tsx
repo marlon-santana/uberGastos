@@ -201,8 +201,13 @@ export function AdsProvider({ children }: PropsWithChildren) {
           setInterstitialPlacement(null);
           executeAfterClose();
         });
+      } else if (interstitial) {
+        interstitial.load();
       } else {
-        interstitial?.load();
+        // AdMob native module unavailable (e.g. Expo Go) - never block the user's action.
+        shouldShowRef.current = false;
+        setInterstitialPlacement(null);
+        executeAfterClose();
       }
 
       return true;

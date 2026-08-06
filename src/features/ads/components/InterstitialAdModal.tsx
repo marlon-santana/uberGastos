@@ -1,7 +1,7 @@
 import React from "react";
 import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
 import { useAds } from "@/features/ads/hooks";
-import { colors, radii, spacing } from "@/shared/theme";
+import { colors, font, radii, shadow, spacing } from "@/shared/theme";
 
 export function InterstitialAdModal() {
   const { adsEnabled, isInterstitialVisible, interstitialPlacement, closeInterstitial } =
@@ -20,15 +20,15 @@ export function InterstitialAdModal() {
     >
       <View style={styles.backdrop}>
         <View style={styles.card}>
-          <Text style={styles.badge}>Anuncio Intersticial</Text>
-          <Text style={styles.title}>Dirija com estrategia</Text>
+          <Text style={styles.badge}>Anúncio Intersticial</Text>
+          <Text style={styles.title}>Dirija com estratégia</Text>
           <Text style={styles.description}>
-            Veja como aumentar sua margem diaria usando metas de corridas e custos fixos.
+            Veja como aumentar sua margem diária usando metas de corridas e custos fixos.
           </Text>
           <Text style={styles.meta}>Origem: {interstitialPlacement || "app"}</Text>
 
           <Pressable style={styles.button} onPress={closeInterstitial}>
-            <Text style={styles.buttonLabel}>Fechar anuncio</Text>
+            <Text style={styles.buttonLabel}>Fechar anúncio</Text>
           </Pressable>
         </View>
       </View>
@@ -51,38 +51,41 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     borderRadius: radii.lg,
     padding: spacing.lg,
+    ...shadow.card,
   },
   badge: {
     color: colors.info,
     fontSize: 12,
-    fontWeight: "700",
+    fontFamily: font.bold,
     marginBottom: spacing.sm,
   },
   title: {
     color: colors.text,
     fontSize: 22,
-    fontWeight: "800",
+    fontFamily: font.extrabold,
     marginBottom: spacing.sm,
   },
   description: {
     color: colors.textMuted,
+    fontFamily: font.regular,
     lineHeight: 20,
     marginBottom: spacing.md,
   },
   meta: {
     color: colors.textMuted,
+    fontFamily: font.regular,
     fontSize: 12,
     marginBottom: spacing.lg,
   },
   button: {
     backgroundColor: colors.primary,
-    borderRadius: radii.md,
+    borderRadius: radii.round,
     alignItems: "center",
     paddingVertical: spacing.sm,
   },
   buttonLabel: {
-    color: colors.background,
-    fontWeight: "700",
+    color: colors.onPrimary,
+    fontFamily: font.bold,
     fontSize: 15,
   },
 });

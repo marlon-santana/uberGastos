@@ -4,7 +4,7 @@ import { Picker } from "@react-native-picker/picker";
 import { FixedAdBanner } from "@/features/ads/components";
 import { useAds } from "@/features/ads/hooks";
 import { Card, PrimaryButton } from "@/shared/components";
-import { colors, spacing } from "@/shared/theme";
+import { colors, font, radii, spacing } from "@/shared/theme";
 import { languages } from "@/shared/utils/languages";
 import { useTranslation } from "react-i18next";
 import i18n from "@/shared/i18n";
@@ -27,11 +27,11 @@ export default function SettingsScreen() {
     const result = await applyCoupon(couponCode);
 
     if (result === "disabled") {
-      setCouponFeedback("Cupom DEVELOP aplicado: anuncios ocultos.");
+      setCouponFeedback(t("settings.coupon.feedbackDisabled"));
     } else if (result === "enabled") {
-      setCouponFeedback("Cupom ADS aplicado: anuncios ativados.");
+      setCouponFeedback(t("settings.coupon.feedbackEnabled"));
     } else {
-      setCouponFeedback("Cupom invalido. Use DEVELOP ou ADS.");
+      setCouponFeedback(t("settings.coupon.feedbackInvalid"));
     }
   };
 
@@ -58,19 +58,24 @@ export default function SettingsScreen() {
         </View>
 
         <View style={styles.couponSection}>
-          <Text style={styles.subtitle}>Cupom de anuncios</Text>
+          <Text style={styles.subtitle}>{t("settings.coupon.title")}</Text>
           <Text style={styles.text}>
-            Estado atual: {adsEnabled ? "anuncios ativos" : "anuncios ocultos"}
+            {adsEnabled
+              ? t("settings.coupon.statusActive")
+              : t("settings.coupon.statusHidden")}
           </Text>
           <TextInput
-            placeholder="Digite DEVELOP ou ADS"
+            placeholder={t("settings.coupon.placeholder")}
             placeholderTextColor={colors.textMuted}
             value={couponCode}
             onChangeText={setCouponCode}
             autoCapitalize="characters"
             style={styles.input}
           />
-          <PrimaryButton label="Aplicar cupom" onPress={handleApplyCoupon} />
+          <PrimaryButton
+            label={t("settings.coupon.applyButton")}
+            onPress={handleApplyCoupon}
+          />
           {couponFeedback ? (
             <Text style={styles.feedback}>{couponFeedback}</Text>
           ) : null}
@@ -90,24 +95,25 @@ const styles = StyleSheet.create({
   },
   title: {
     color: colors.text,
-    fontWeight: "700",
+    fontFamily: font.bold,
     fontSize: 20,
     marginBottom: spacing.sm,
   },
   text: {
     color: colors.textMuted,
+    fontFamily: font.regular,
     lineHeight: 22,
   },
   subtitle: {
     color: colors.text,
-    fontWeight: "600",
+    fontFamily: font.semibold,
     fontSize: 16,
     marginBottom: spacing.sm,
   },
   picker: {
     backgroundColor: colors.surface,
     color: colors.text,
-    borderRadius: 8,
+    borderRadius: radii.sm,
     marginTop: spacing.sm,
   },
   couponSection: {
@@ -115,7 +121,7 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   input: {
-    borderRadius: 8,
+    borderRadius: radii.sm,
     borderWidth: 1,
     borderColor: colors.border,
     backgroundColor: colors.surfaceAlt,
@@ -125,6 +131,7 @@ const styles = StyleSheet.create({
   },
   feedback: {
     color: colors.textMuted,
+    fontFamily: font.regular,
     lineHeight: 20,
   },
 });

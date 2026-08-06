@@ -11,7 +11,6 @@ interface FixedAdBannerProps {
 
 export function FixedAdBanner({ placement }: FixedAdBannerProps) {
   const { adsEnabled } = useAds();
-  void placement;
   const adsLib = getGoogleMobileAdsLib();
 
   if (!adsEnabled || !adsLib) {
@@ -22,7 +21,7 @@ export function FixedAdBanner({ placement }: FixedAdBannerProps) {
   const BannerAdSize = adsLib.BannerAdSize;
 
   return (
-    <View style={styles.wrapper}>
+    <View style={styles.wrapper} testID={`ad-banner-${placement}`}>
       <View style={styles.banner}>
         <BannerAd
           unitId={BANNER_AD_UNIT_ID}

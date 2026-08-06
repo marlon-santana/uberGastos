@@ -7,7 +7,7 @@ import {
   Text,
   View,
 } from "react-native";
-import { colors, radii, spacing } from "@/shared/theme";
+import { colors, font, radii, spacing } from "@/shared/theme";
 
 interface ResetMonthNoticeModalProps {
   visible: boolean;
@@ -90,24 +90,25 @@ const styles = StyleSheet.create({
   title: {
     color: colors.primary,
     fontSize: 18,
-    fontWeight: "800",
+    fontFamily: font.extrabold,
     marginBottom: spacing.sm,
   },
   message: {
     color: colors.text,
     fontSize: 15,
+    fontFamily: font.regular,
     lineHeight: 22,
   },
   closeButton: {
     marginTop: spacing.md,
     backgroundColor: colors.danger,
-    borderRadius: radii.md,
+    borderRadius: radii.round,
     alignItems: "center",
     paddingVertical: spacing.sm,
   },
   closeButtonLabel: {
     color: colors.text,
     fontSize: 15,
-    fontWeight: "700",
+    fontFamily: font.bold,
   },
 });

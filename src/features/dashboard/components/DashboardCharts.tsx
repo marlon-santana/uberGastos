@@ -4,7 +4,7 @@ import { formatDecimal } from "@/shared/utils";
 import { parseISODateLocal, toISODate } from "@/shared/utils/format";
 import { BarChart, LineChart } from "react-native-chart-kit";
 import { Card } from "@/shared/components";
-import { colors, spacing } from "@/shared/theme";
+import { colors, font, radii, spacing } from "@/shared/theme";
 import { Transaction } from "@/features/transactions/types";
 import { Period } from "@/shared/types/common";
 import { DailyRidesLineChart } from "@/features/dashboard/components/DailyRidesLineChart";
@@ -23,8 +23,9 @@ const chartConfig = {
   backgroundGradientFrom: colors.surface,
   backgroundGradientTo: colors.surface,
   decimalPlaces: 0,
-  color: (opacity = 1) => `rgba(77, 208, 138, ${opacity})`,
+  color: () => colors.accent,
   labelColor: (opacity = 1) => `rgba(233, 244, 238, ${opacity})`,
+  fillShadowGradientOpacity: 1,
   propsForBackgroundLines: {
     stroke: colors.border,
     strokeDasharray: "",
@@ -35,7 +36,7 @@ const lineChartConfig = {
   backgroundGradientFrom: colors.surface,
   backgroundGradientTo: colors.surface,
   decimalPlaces: 0,
-  color: (opacity = 1) => `rgba(77, 208, 138, ${opacity})`,
+  color: () => colors.accent,
   labelColor: (opacity = 1) => `rgba(233, 244, 238, ${opacity})`,
   propsForBackgroundLines: {
     stroke: colors.border,
@@ -74,15 +75,13 @@ export const DashboardCharts = React.memo(function DashboardCharts({
     if (period === "weekly") {
       const now = new Date();
       now.setHours(0, 0, 0, 0);
-      const dayOfWeek = now.getDay();
-      const sunday = new Date(now);
-      sunday.setDate(now.getDate() - dayOfWeek);
-      sunday.setHours(0, 0, 0, 0);
+      const dayOfWeek = now.getDay(); // 0 = Domingo .. 6 = Sábado
+      const weekStart = new Date(now);
+      weekStart.setDate(now.getDate() - dayOfWeek);
 
       const weekDates = Array.from({ length: 7 }, (_, index) => {
-        const date = new Date(sunday);
-        date.setDate(sunday.getDate() + index);
-        date.setHours(0, 0, 0, 0);
+        const date = new Date(weekStart);
+        date.setDate(weekStart.getDate() + index);
         return date;
       });
 
@@ -169,7 +168,7 @@ export const DashboardCharts = React.memo(function DashboardCharts({
             datasets: [
               {
                 data: groupedData.income,
-                color: (opacity = 1) => `rgba(77, 208, 138, ${opacity})`,
+                color: () => colors.accent,
               },
             ],
           }}
@@ -193,7 +192,7 @@ export const DashboardCharts = React.memo(function DashboardCharts({
             datasets: [
               {
                 data: groupedData.expense,
-                color: (opacity = 1) => `rgba(255, 92, 92, ${opacity})`,
+                color: () => colors.danger,
               },
             ],
           }}
@@ -204,7 +203,7 @@ export const DashboardCharts = React.memo(function DashboardCharts({
           yAxisSuffix=""
           chartConfig={{
             ...chartConfig,
-            color: (opacity = 1) => `rgba(255, 92, 92, ${opacity})`,
+            color: () => colors.danger,
           }}
           style={styles.chart}
           showValuesOnTopOfBars
@@ -229,9 +228,7 @@ export const DashboardCharts = React.memo(function DashboardCharts({
           bezier
           style={styles.chart}
           withDots
-          withInnerLines
           withOuterLines
-          withVerticalLines
           withHorizontalLines
         />
       </Card>
@@ -248,13 +245,11 @@ export const DashboardCharts = React.memo(function DashboardCharts({
           fromZero
           chartConfig={{
             ...lineChartConfig,
-            color: (opacity = 1) => `rgba(61, 169, 252, ${opacity})`,
+            color: () => colors.info,
           }}
           style={styles.chart}
           withDots
-          withInnerLines
           withOuterLines
-          withVerticalLines
           withHorizontalLines
         />
       </Card>
@@ -272,10 +267,10 @@ const styles = StyleSheet.create({
   title: {
     color: colors.text,
     fontSize: 16,
-    fontWeight: "700",
+    fontFamily: font.bold,
     marginBottom: spacing.sm,
   },
   chart: {
-    borderRadius: 12,
+    borderRadius: radii.md,
   },
 });

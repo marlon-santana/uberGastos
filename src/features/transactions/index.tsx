@@ -1,21 +1,31 @@
 import React, { useMemo, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   Pressable,
-  ScrollView,
   StyleSheet,
+  Switch,
   Text,
   View,
 } from "react-native";
 import { TransactionsList } from "@/features/transactions/components/TransactionsList";
 import { FixedAdBanner } from "@/features/ads/components";
-import { useTransactions } from "@/features/transactions/hooks/useTransactions";
-import { colors, spacing } from "@/shared/theme";
+import {
+  useCategories,
+  useTransactions,
+} from "@/features/transactions/hooks";
+import { CategoryChipsRow } from "@/shared/components";
+import { colors, font, radii, spacing } from "@/shared/theme";
+
+const ALL_CATEGORIES_LABEL = "Todas";
 
 export default function TransactionsScreen() {
   const { transactions, loading, clearTransactions } = useTransactions();
+  const { deleteCategory, isCustom } = useCategories();
   const [deleteAllSelected, setDeleteAllSelected] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState("Todas");
+  const [selectedCategory, setSelectedCategory] = useState(
+    ALL_CATEGORIES_LABEL,
+  );
 
   const categories = useMemo(() => {
     const seen = new Set<string>();
@@ -40,7 +50,7 @@ export default function TransactionsScreen() {
   }, [transactions]);
 
   const filteredTransactions = useMemo(() => {
-    if (selectedCategory === "Todas") {
+    if (selectedCategory === ALL_CATEGORIES_LABEL) {
       return transactions;
     }
 
@@ -53,12 +63,32 @@ export default function TransactionsScreen() {
 
   React.useEffect(() => {
     if (
-      selectedCategory !== "Todas" &&
+      selectedCategory !== ALL_CATEGORIES_LABEL &&
       !categories.includes(selectedCategory)
     ) {
-      setSelectedCategory("Todas");
+      setSelectedCategory(ALL_CATEGORIES_LABEL);
     }
   }, [categories, selectedCategory]);
+
+  const handleDeleteCategory = (category: string) => {
+    Alert.alert(
+      "Excluir categoria",
+      `Deseja excluir a categoria "${category}"? Os lançamentos já registrados não serão apagados.`,
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Excluir",
+          style: "destructive",
+          onPress: () => {
+            deleteCategory(category);
+            if (selectedCategory === category) {
+              setSelectedCategory(ALL_CATEGORIES_LABEL);
+            }
+          },
+        },
+      ],
+    );
+  };
 
   if (loading) {
     return (
@@ -72,17 +102,15 @@ export default function TransactionsScreen() {
     <View style={styles.container}>
       <View style={styles.actionsRow}>
         <Pressable
-          style={styles.radioRow}
+          style={styles.switchRow}
           onPress={() => setDeleteAllSelected((prev) => !prev)}
         >
-          <View
-            style={[
-              styles.radioOuter,
-              deleteAllSelected && styles.radioOuterSelected,
-            ]}
-          >
-            {deleteAllSelected ? <View style={styles.radioInner} /> : null}
-          </View>
+          <Switch
+            value={deleteAllSelected}
+            onValueChange={setDeleteAllSelected}
+            trackColor={{ false: colors.surfaceAlt, true: colors.primary }}
+            thumbColor={colors.text}
+          />
           <Text style={styles.actionLabel}>Deletar todos</Text>
         </Pressable>
         <Pressable
@@ -96,34 +124,18 @@ export default function TransactionsScreen() {
             !deleteAllSelected && styles.deleteButtonDisabled,
           ]}
         >
-          <Text style={styles.deleteButtonLabel}>Limpar historico</Text>
+          <Text style={styles.deleteButtonLabel}>Limpar histórico</Text>
         </Pressable>
       </View>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.categoryChipsRow}
-      >
-        {["Todas", ...categories].map((category) => (
-          <Pressable
-            key={category}
-            onPress={() => setSelectedCategory(category)}
-            style={[
-              styles.categoryChip,
-              selectedCategory === category && styles.categoryChipActive,
-            ]}
-          >
-            <Text
-              style={[
-                styles.categoryChipText,
-                selectedCategory === category && styles.categoryChipTextActive,
-              ]}
-            >
-              {category}
-            </Text>
-          </Pressable>
-        ))}
-      </ScrollView>
+      <CategoryChipsRow
+        items={[ALL_CATEGORIES_LABEL, ...categories]}
+        selected={selectedCategory}
+        onSelect={setSelectedCategory}
+        isDeletable={(category) =>
+          category !== ALL_CATEGORIES_LABEL && isCustom(category)
+        }
+        onDelete={handleDeleteCategory}
+      />
       <TransactionsList transactions={filteredTransactions} />
       <FixedAdBanner placement="transactions_bottom" />
     </View>
@@ -140,39 +152,24 @@ const styles = StyleSheet.create({
   },
   actionsRow: {
     marginBottom: spacing.md,
-    gap: spacing.sm,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
-  radioRow: {
+  switchRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: spacing.sm,
   },
-  radioOuter: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: colors.textMuted,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  radioOuterSelected: {
-    borderColor: colors.primary,
-  },
-  radioInner: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: colors.primary,
-  },
   actionLabel: {
     color: colors.text,
-    fontWeight: "600",
+    fontFamily: font.semibold,
   },
   deleteButton: {
     backgroundColor: colors.danger,
-    borderRadius: 10,
+    borderRadius: radii.round,
     paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
     alignItems: "center",
   },
   deleteButtonDisabled: {
@@ -180,35 +177,7 @@ const styles = StyleSheet.create({
   },
   deleteButtonLabel: {
     color: colors.text,
-    fontWeight: "700",
-  },
-  categoryChipsRow: {
-    gap: spacing.xs,
-    paddingBottom: spacing.sm,
-    height: 46,
-  },
-  categoryChip: {
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: colors.surface,
-    backgroundColor: colors.surface,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    height: 46,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  categoryChipActive: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
-  },
-  categoryChipText: {
-    color: colors.text,
-    fontWeight: "600",
-    fontSize: 13,
-  },
-  categoryChipTextActive: {
-    color: "#0B1110",
+    fontFamily: font.bold,
   },
   loadingContainer: {
     flex: 1,

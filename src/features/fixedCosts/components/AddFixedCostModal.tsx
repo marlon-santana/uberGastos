@@ -1,6 +1,8 @@
 import React, { useCallback, useMemo, useState } from "react";
 import {
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   Pressable,
   StyleSheet,
   Text,
@@ -9,9 +11,11 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { PrimaryButton } from "@/shared/components";
-import { colors, radii, spacing } from "@/shared/theme";
+import { colors, font, radii, spacing } from "@/shared/theme";
 import { toISODate } from "@/shared/utils/format";
 import { FixedCostInput } from "@/features/fixedCosts/types";
+
+const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 
 interface AddFixedCostModalProps {
   visible: boolean;
@@ -28,14 +32,16 @@ export function AddFixedCostModal({
   const [description, setDescription] = useState<string>("");
   const [startDate, setStartDate] = useState<string>(toISODate());
   const [daysToPayoff, setDaysToPayoff] = useState<string>("");
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const canSubmit = useMemo(() => {
     return (
       Number(value) > 0 &&
       description.trim().length > 0 &&
-      Number(daysToPayoff) > 0
+      Number(daysToPayoff) > 0 &&
+      DATE_REGEX.test(startDate)
     );
-  }, [value, description, daysToPayoff]);
+  }, [value, description, daysToPayoff, startDate]);
 
   const reset = useCallback(() => {
     setValue("");
@@ -45,21 +51,27 @@ export function AddFixedCostModal({
   }, []);
 
   const handleSubmit = useCallback(async () => {
-    if (!canSubmit) {
+    if (!canSubmit || isSubmitting) {
       return;
     }
 
-    await onSubmit({
-      value: Number(value),
-      description: description.trim(),
-      startDate,
-      daysToPayoff: Number(daysToPayoff),
-    });
+    setIsSubmitting(true);
+    try {
+      await onSubmit({
+        value: Number(value),
+        description: description.trim(),
+        startDate,
+        daysToPayoff: Number(daysToPayoff),
+      });
 
-    reset();
-    onClose();
+      reset();
+      onClose();
+    } finally {
+      setIsSubmitting(false);
+    }
   }, [
     canSubmit,
+    isSubmitting,
     onSubmit,
     value,
     description,
@@ -76,8 +88,13 @@ export function AddFixedCostModal({
       animationType="slide"
       onRequestClose={onClose}
     >
-      <View style={styles.backdrop}>
+      <KeyboardAvoidingView
+        style={styles.backdrop}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
+        <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
         <SafeAreaView style={styles.sheet} edges={["bottom"]}>
+          <View style={styles.dragHandle} />
           <Text style={styles.title}>Novo Custo Fixo</Text>
 
           <TextInput
@@ -111,12 +128,16 @@ export function AddFixedCostModal({
             style={styles.input}
           />
 
-          <PrimaryButton label="Adicionar Custo Fixo" onPress={handleSubmit} />
+          <PrimaryButton
+            label="Adicionar Custo Fixo"
+            onPress={handleSubmit}
+            disabled={!canSubmit || isSubmitting}
+          />
           <Pressable onPress={onClose} style={styles.cancelButton}>
             <Text style={styles.cancelText}>Cancelar</Text>
           </Pressable>
         </SafeAreaView>
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }
@@ -134,10 +155,18 @@ const styles = StyleSheet.create({
     borderTopRightRadius: radii.lg,
     gap: spacing.sm,
   },
+  dragHandle: {
+    alignSelf: "center",
+    width: 40,
+    height: 4,
+    borderRadius: radii.round,
+    backgroundColor: colors.border,
+    marginBottom: spacing.xs,
+  },
   title: {
     color: colors.text,
     fontSize: 20,
-    fontWeight: "700",
+    fontFamily: font.bold,
     marginBottom: spacing.sm,
   },
   input: {
@@ -155,6 +184,6 @@ const styles = StyleSheet.create({
   },
   cancelText: {
     color: colors.textMuted,
-    fontWeight: "600",
+    fontFamily: font.semibold,
   },
 });

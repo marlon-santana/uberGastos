@@ -9,7 +9,7 @@ import { useFixedCosts } from "@/features/fixedCosts/hooks";
 import { useAds } from "@/features/ads/hooks";
 import { FixedAdBanner } from "@/features/ads/components";
 import { Card, FloatingActionButton } from "@/shared/components";
-import { colors, spacing } from "@/shared/theme";
+import { colors, font, spacing } from "@/shared/theme";
 
 export default function FixedCostsScreen() {
   const {
@@ -40,7 +40,7 @@ export default function FixedCostsScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Card>
+        <Card raised>
           <Text style={styles.headerTitle}>Total Diário Necessário</Text>
           <Text style={styles.headerAmount}>
             R$ {formatDecimal(totalDailyAmount)}/dia
@@ -89,18 +89,19 @@ const styles = StyleSheet.create({
   headerTitle: {
     color: colors.textMuted,
     fontSize: 14,
-    fontWeight: "600",
+    fontFamily: font.semibold,
     marginBottom: spacing.xs,
   },
   headerAmount: {
     color: colors.primary,
     fontSize: 32,
-    fontWeight: "700",
+    fontFamily: font.extrabold,
     marginBottom: spacing.xs,
   },
   headerSubtext: {
     color: colors.textMuted,
     fontSize: 13,
+    fontFamily: font.regular,
     lineHeight: 18,
   },
   content: {

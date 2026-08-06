@@ -4,7 +4,10 @@ import { StyleSheet, ActivityIndicator, View } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { DashboardProvider } from "@/features/dashboard/context";
-import { TransactionsProvider } from "@/features/transactions/context";
+import {
+  TransactionsProvider,
+  CategoriesProvider,
+} from "@/features/transactions/context";
 import { FixedCostsProvider } from "@/features/fixedCosts/context";
 import { WelcomeProvider } from "@/features/welcome/context";
 import { AdsProvider } from "@/features/ads/context";
@@ -35,16 +38,18 @@ export default function App() {
         <WelcomeProvider>
           <AdsProvider>
             <TransactionsProvider>
-              <FixedCostsProvider>
-                <DashboardProvider>
-                  <AppNavigator />
-                  <StatusBar
-                    style="light"
-                    translucent
-                    backgroundColor="transparent"
-                  />
-                </DashboardProvider>
-              </FixedCostsProvider>
+              <CategoriesProvider>
+                <FixedCostsProvider>
+                  <DashboardProvider>
+                    <AppNavigator />
+                    <StatusBar
+                      style="light"
+                      translucent
+                      backgroundColor="transparent"
+                    />
+                  </DashboardProvider>
+                </FixedCostsProvider>
+              </CategoriesProvider>
             </TransactionsProvider>
           </AdsProvider>
         </WelcomeProvider>

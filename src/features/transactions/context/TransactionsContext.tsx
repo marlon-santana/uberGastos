@@ -44,10 +44,13 @@ export function TransactionsProvider({ children }: PropsWithChildren) {
   }, []);
 
   const addTransaction = useCallback(async (type: TransactionType, input: TransactionInput) => {
-    const next = [TransactionFactory.create(type, input), ...transactions];
-    await storageService.save(next);
-    setTransactions(next);
-  }, [transactions]);
+    const transaction = TransactionFactory.create(type, input);
+    setTransactions((prev) => {
+      const next = [transaction, ...prev];
+      storageService.save(next).catch((error) => console.error('Failed to save transaction', error));
+      return next;
+    });
+  }, []);
 
   const clearTransactions = useCallback(async () => {
     await storageService.save([]);

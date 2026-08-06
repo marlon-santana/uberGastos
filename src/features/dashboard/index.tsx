@@ -1,15 +1,15 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useTransition } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   ActivityIndicator,
   Alert,
-  Pressable,
   ScrollView,
   StyleSheet,
-  Text,
   View,
 } from "react-native";
 import { DashboardCharts } from "@/features/dashboard/components/DashboardCharts";
+import { DailyCostCard } from "@/features/dashboard/components/DailyCostCard";
+import { ChartsToggleHeader } from "@/features/dashboard/components/ChartsToggleHeader";
 import { MoneyRain } from "@/features/dashboard/components/MoneyRain";
 import { ResetMonthNoticeModal } from "@/features/dashboard/components/ResetMonthNoticeModal";
 import { PeriodToggle } from "@/features/dashboard/components/PeriodToggle";
@@ -18,29 +18,39 @@ import { useDashboard } from "@/features/dashboard/hooks/useDashboard";
 import { DashboardMetricFactory } from "@/features/dashboard/factory/DashboardMetricFactory";
 import { PeriodStrategyFactory } from "@/features/dashboard/strategies/PeriodStrategy";
 import { AddTransactionModal } from "@/features/transactions/components";
-import { useTransactions } from "@/features/transactions/hooks";
+import { useTransactions, useCategories } from "@/features/transactions/hooks";
+import { useFixedCosts } from "@/features/fixedCosts/hooks";
 import { useAds } from "@/features/ads/hooks";
 import { FixedAdBanner } from "@/features/ads/components";
-import { FloatingActionButton, PrimaryButton } from "@/shared/components";
-import { parseISODateLocal, toMonthKey } from "@/shared/utils/format";
+import {
+  CategoryChipsRow,
+  CongratsModal,
+  EmptyState,
+  FloatingActionButton,
+  PrimaryButton,
+} from "@/shared/components";
+import { parseISODateLocal, toISODate, toMonthKey } from "@/shared/utils/format";
 import { colors, spacing } from "@/shared/theme";
 
 const MONTH_RESET_STORAGE_KEY = "@drivercash:month-reset-ignored-ids";
-const CUSTOM_CATEGORIES_STORAGE_KEY = "@drivercash:custom-categories";
-const DEFAULT_CATEGORIES = ["Uber", "99Taxi", "Ifood"];
+const CHARTS_COLLAPSED_STORAGE_KEY = "@drivercash:dashboard-charts-collapsed";
 const ALL_CATEGORIES_LABEL = "Todas";
 
 type ResetMap = Record<string, string[]>;
 
 export default function DashboardScreen() {
   const { period, setPeriod } = useDashboard();
+  const [isPeriodPending, startPeriodTransition] = useTransition();
   const { transactions, addTransaction, loading } = useTransactions();
+  const { categories, addCategory, deleteCategory, isCustom } =
+    useCategories();
+  const { fixedCosts, totalDailyAmount } = useFixedCosts();
   const { maybeShowInterstitial } = useAds();
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
   const [showCongrats, setShowCongrats] = useState(false);
   const [showResetNotice, setShowResetNotice] = useState(false);
   const [resetMap, setResetMap] = useState<ResetMap>({});
-  const [customCategories, setCustomCategories] = useState<string[]>([]);
+  const [chartsCollapsed, setChartsCollapsed] = useState<boolean>(false);
   const [selectedCategory, setSelectedCategory] = useState<string>(
     ALL_CATEGORIES_LABEL,
   );
@@ -48,6 +58,13 @@ export default function DashboardScreen() {
   const moneyRainTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(
     null,
   );
+  const mountedRef = React.useRef(true);
+
+  React.useEffect(() => {
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   const filteredTransactions = useMemo(() => {
     const periodStrategy = PeriodStrategyFactory.create(period);
@@ -79,23 +96,32 @@ export default function DashboardScreen() {
   React.useEffect(() => {
     let mounted = true;
 
-    const loadCustomCategories = async () => {
+    const loadChartsCollapsed = async () => {
       try {
-        const raw = await AsyncStorage.getItem(CUSTOM_CATEGORIES_STORAGE_KEY);
-        if (mounted && raw) {
-          const parsed = JSON.parse(raw) as string[];
-          setCustomCategories(parsed);
+        const stored = await AsyncStorage.getItem(CHARTS_COLLAPSED_STORAGE_KEY);
+        if (mounted && stored !== null) {
+          setChartsCollapsed(stored === "true");
         }
       } catch (error) {
-        console.error("Failed to load categories", error);
+        console.error("Failed to load charts visibility preference", error);
       }
     };
 
-    loadCustomCategories();
+    loadChartsCollapsed();
 
     return () => {
       mounted = false;
     };
+  }, []);
+
+  const handleToggleCharts = React.useCallback(() => {
+    setChartsCollapsed((prev) => {
+      const next = !prev;
+      AsyncStorage.setItem(CHARTS_COLLAPSED_STORAGE_KEY, String(next)).catch((error) => {
+        console.error("Failed to persist charts visibility preference", error);
+      });
+      return next;
+    });
   }, []);
 
   const currentMonthKey = toMonthKey();
@@ -109,11 +135,6 @@ export default function DashboardScreen() {
         (transaction) => !ignoredCurrentMonthIds.has(transaction.id),
       ),
     [filteredTransactions, ignoredCurrentMonthIds],
-  );
-
-  const categories = useMemo(
-    () => [...DEFAULT_CATEGORIES, ...customCategories],
-    [customCategories],
   );
 
   React.useEffect(() => {
@@ -150,38 +171,14 @@ export default function DashboardScreen() {
     };
   }, [cardTransactions]);
 
-  const persistCategories = React.useCallback(async (next: string[]) => {
-    try {
-      await AsyncStorage.setItem(
-        CUSTOM_CATEGORIES_STORAGE_KEY,
-        JSON.stringify(next),
-      );
-    } catch (error) {
-      console.error("Failed to persist categories", error);
-    }
-  }, []);
-
-  const handleAddCategory = React.useCallback(
-    async (category: string) => {
-      const normalized = category.trim();
-      if (!normalized) {
-        return false;
-      }
-
-      const alreadyExists = [...DEFAULT_CATEGORIES, ...customCategories].some(
-        (item) => item.toLowerCase() === normalized.toLowerCase(),
-      );
-      if (alreadyExists) {
-        return false;
-      }
-
-      const next = [...customCategories, normalized];
-      setCustomCategories(next);
-      await persistCategories(next);
-      return true;
-    },
-    [customCategories, persistCategories],
-  );
+  const todayNetProfit = useMemo(() => {
+    const todayISO = toISODate();
+    const todayTransactions = transactions.filter(
+      (transaction) => transaction.date === todayISO,
+    );
+    const netService = DashboardMetricFactory.createNetProfitService();
+    return netService.execute(todayTransactions);
+  }, [transactions]);
 
   const handleDeleteCategory = React.useCallback(
     (category: string) => {
@@ -194,9 +191,7 @@ export default function DashboardScreen() {
             text: "Excluir",
             style: "destructive",
             onPress: () => {
-              const next = customCategories.filter((item) => item !== category);
-              setCustomCategories(next);
-              persistCategories(next);
+              deleteCategory(category);
               if (selectedCategory === category) {
                 setSelectedCategory(ALL_CATEGORIES_LABEL);
               }
@@ -205,7 +200,7 @@ export default function DashboardScreen() {
         ],
       );
     },
-    [customCategories, persistCategories, selectedCategory],
+    [deleteCategory, selectedCategory],
   );
 
   React.useEffect(() => {
@@ -230,6 +225,7 @@ export default function DashboardScreen() {
     const type = args[0];
     const wasEmpty = transactions.length === 0;
     await addTransaction(...args);
+    if (!mountedRef.current) return;
     if (wasEmpty) setShowCongrats(true);
     if (type === "income") {
       setShowMoneyRain(true);
@@ -237,7 +233,7 @@ export default function DashboardScreen() {
         clearTimeout(moneyRainTimerRef.current);
       }
       moneyRainTimerRef.current = setTimeout(() => {
-        setShowMoneyRain(false);
+        if (mountedRef.current) setShowMoneyRain(false);
       }, 3800);
     }
   };
@@ -283,65 +279,71 @@ export default function DashboardScreen() {
             tone="expense"
           />
         </View>
-        <SummaryCard label="Lucro" value={metrics.netProfit} tone="profit" />
+        <SummaryCard
+          label="Lucro"
+          value={metrics.netProfit}
+          tone="profit"
+          emphasis
+        />
+
+        {fixedCosts.length > 0 && (
+          <DailyCostCard
+            todayNetProfit={todayNetProfit}
+            totalDailyAmount={totalDailyAmount}
+          />
+        )}
+
         <PrimaryButton label="Resetar mês Atual" onPress={handleResetMonth} />
 
-        <PeriodToggle selected={period} onChange={setPeriod} />
+        <View style={styles.periodRow}>
+          <PeriodToggle
+            selected={period}
+            onChange={(nextPeriod) =>
+              startPeriodTransition(() => setPeriod(nextPeriod))
+            }
+          />
+          {isPeriodPending ? (
+            <ActivityIndicator
+              size="small"
+              color={colors.primary}
+              style={styles.periodPendingIndicator}
+            />
+          ) : null}
+        </View>
 
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.categoryChipsRow}
-        >
-          {[ALL_CATEGORIES_LABEL, ...categories].map((category) => (
-            <Pressable
-              key={category}
-              onPress={() => setSelectedCategory(category)}
-              style={[
-                styles.categoryChip,
-                selectedCategory === category && styles.categoryChipActive,
-              ]}
-            >
-              <View style={styles.categoryChipContent}>
-                <Text
-                  style={[
-                    styles.categoryChipText,
-                    selectedCategory === category &&
-                      styles.categoryChipTextActive,
-                  ]}
-                >
-                  {category}
-                </Text>
-                {category !== ALL_CATEGORIES_LABEL &&
-                !DEFAULT_CATEGORIES.includes(category) ? (
-                  <Pressable
-                    hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
-                    onPress={() => handleDeleteCategory(category)}
-                    style={styles.deleteCategoryButton}
-                  >
-                    <Text
-                      style={[
-                        styles.deleteCategoryText,
-                        selectedCategory === category &&
-                          styles.deleteCategoryTextActive,
-                      ]}
-                    >
-                      x
-                    </Text>
-                  </Pressable>
-                ) : null}
-              </View>
-            </Pressable>
-          ))}
-        </ScrollView>
-
-        <DashboardCharts
-          income={metrics.income}
-          expense={metrics.expense}
-          netProfit={metrics.netProfit}
-          transactions={chartTransactions}
-          period={period}
+        <CategoryChipsRow
+          items={[ALL_CATEGORIES_LABEL, ...categories]}
+          selected={selectedCategory}
+          onSelect={setSelectedCategory}
+          isDeletable={(category) =>
+            category !== ALL_CATEGORIES_LABEL && isCustom(category)
+          }
+          onDelete={handleDeleteCategory}
         />
+
+        {transactions.length === 0 ? (
+          <EmptyState
+            icon="bar-chart-2"
+            title="Nenhum lançamento ainda"
+            subtitle="Registre seu primeiro ganho ou despesa para ver seus gráficos aqui."
+          />
+        ) : (
+          <>
+            <ChartsToggleHeader
+              collapsed={chartsCollapsed}
+              onToggle={handleToggleCharts}
+            />
+            {!chartsCollapsed && (
+              <DashboardCharts
+                income={metrics.income}
+                expense={metrics.expense}
+                netProfit={metrics.netProfit}
+                transactions={chartTransactions}
+                period={period}
+              />
+            )}
+          </>
+        )}
       </ScrollView>
 
       <FixedAdBanner placement="dashboard_bottom" />
@@ -351,14 +353,17 @@ export default function DashboardScreen() {
         onClose={() => setModalOpen(false)}
         onSubmit={handleAddTransaction}
         categories={categories}
-        onAddCategory={handleAddCategory}
+        onAddCategory={addCategory}
       />
       <ResetMonthNoticeModal
         visible={showResetNotice}
         onClose={() => setShowResetNotice(false)}
       />
       <MoneyRain visible={showMoneyRain} />
-      {/* <CongratsModal visible={showCongrats} onClose={() => setShowCongrats(false)} /> */}
+      <CongratsModal
+        visible={showCongrats}
+        onClose={() => setShowCongrats(false)}
+      />
     </View>
   );
 }
@@ -378,58 +383,19 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: spacing.sm,
   },
+  periodRow: {
+    position: "relative",
+  },
+  periodPendingIndicator: {
+    position: "absolute",
+    right: spacing.sm,
+    top: "50%",
+    marginTop: -8,
+  },
   loadingContainer: {
     flex: 1,
     backgroundColor: colors.background,
     alignItems: "center",
     justifyContent: "center",
-  },
-  categoryChipsRow: {
-    gap: spacing.xs,
-    paddingBottom: spacing.xs,
-  },
-  categoryChip: {
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.surface,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-  },
-  categoryChipContent: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.xs,
-  },
-  categoryChipActive: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
-  },
-  categoryChipText: {
-    color: colors.text,
-    fontWeight: "600",
-    fontSize: 13,
-  },
-  categoryChipTextActive: {
-    color: "#0B1110",
-  },
-  deleteCategoryButton: {
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: colors.border,
-    width: 18,
-    height: 18,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: colors.surfaceAlt,
-  },
-  deleteCategoryText: {
-    color: colors.textMuted,
-    fontSize: 12,
-    fontWeight: "700",
-    lineHeight: 14,
-  },
-  deleteCategoryTextActive: {
-    color: "#0B1110",
   },
 });

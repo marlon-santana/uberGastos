@@ -5,7 +5,9 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
+    "icon": "./src/shared/assets/icons/icon-1024.png",
     "splash": {
+      "image": "./src/shared/assets/icons/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#0B1110"
     },
@@ -13,7 +15,11 @@
       "**/*"
     ],
     "android": {
-      "package": "com.marlonnig.drivercash"
+      "package": "com.marlonnig.drivercash",
+      "adaptiveIcon": {
+        "foregroundImage": "./src/shared/assets/icons/adaptive-icon-foreground.png",
+        "backgroundColor": "#0B1110"
+      }
     },
     "plugins": [
       "expo-asset",

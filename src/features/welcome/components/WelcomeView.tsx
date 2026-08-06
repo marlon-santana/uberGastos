@@ -1,11 +1,10 @@
 import React, { useMemo } from "react";
-import { StyleSheet, Text, View, ScrollView } from "react-native";
-import { Feather } from "@expo/vector-icons";
+import { Image, StyleSheet, Text, View, ScrollView } from "react-native";
 import { WelcomeFactory } from "@/features/welcome/factory/WelcomeFactory";
 import { WelcomeMessageStrategy } from "@/features/welcome/strategies/WelcomeMessageStrategy";
 import { FeaturedTodoList } from "@/features/welcome/components/FeaturedTodoList";
 import { PrimaryButton } from "@/shared/components";
-import { colors, spacing } from "@/shared/theme";
+import { colors, font, radii, shadow, spacing } from "@/shared/theme";
 
 interface WelcomeViewProps {
   onStart: () => void;
@@ -23,7 +22,11 @@ export function WelcomeView({ onStart }: WelcomeViewProps) {
       >
         <View style={styles.header}>
           <View style={styles.iconContainer}>
-            <Feather name="dollar-sign" size={48} color={colors.primary} />
+            <Image
+              source={require("../../../shared/assets/icons/adaptive-icon-foreground.png")}
+              style={styles.logoImage}
+              resizeMode="contain"
+            />
           </View>
           <Text style={styles.title}>{strategy.getTitle()}</Text>
           <Text style={styles.subtitle}>
@@ -58,26 +61,32 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xl,
   },
   iconContainer: {
-    width: 90,
-    height: 90,
-    borderRadius: 45,
+    width: 128,
+    height: 128,
+    borderRadius: radii.round,
     backgroundColor: colors.surface,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: spacing.lg,
     borderWidth: 2,
     borderColor: colors.primary,
+    ...shadow.primary,
+  },
+  logoImage: {
+    width: 92,
+    height: 92,
   },
   title: {
     color: colors.text,
     fontSize: 32,
-    fontWeight: "800",
+    fontFamily: font.extrabold,
     textAlign: "center",
     marginBottom: spacing.sm,
   },
   subtitle: {
     color: colors.textMuted,
     fontSize: 16,
+    fontFamily: font.regular,
     textAlign: "center",
     lineHeight: 24,
     paddingHorizontal: spacing.md,

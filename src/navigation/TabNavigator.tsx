@@ -6,7 +6,7 @@ import TransactionsScreen from "@/features/transactions";
 import FixedCostsScreen from "@/features/fixedCosts";
 import SettingsScreen from "@/screens/SettingsScreen";
 import { useAds } from "@/features/ads/hooks";
-import { colors } from "@/shared/theme";
+import { colors, font } from "@/shared/theme";
 import { Feather } from "@expo/vector-icons";
 
 export type RootTabParamList = {
@@ -39,16 +39,16 @@ export function TabNavigator() {
         },
         tabBarLabelStyle: {
           fontSize: 12,
-          fontWeight: "600",
+          fontFamily: font.semibold,
         },
         tabBarIcon: ({ color, size }) => {
           let iconName: keyof typeof Feather.glyphMap = "circle";
           if (route.name === "Dashboard") {
-            iconName = "grid";
+            iconName = "bar-chart-2";
           } else if (route.name === "Historico") {
-            iconName = "clock";
+            iconName = "list";
           } else if (route.name === "CustoFixo") {
-            iconName = "dollar-sign";
+            iconName = "repeat";
           } else if (route.name === "Configuracoes") {
             iconName = "settings";
           }

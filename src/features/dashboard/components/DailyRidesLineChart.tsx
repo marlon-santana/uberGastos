@@ -4,7 +4,7 @@ import { BarChart } from "react-native-chart-kit";
 import { Transaction } from "@/features/transactions/types";
 import { Card } from "@/shared/components";
 import { parseISODateLocal, toISODate } from "@/shared/utils/format";
-import { colors, spacing } from "@/shared/theme";
+import { colors, font, radii, spacing } from "@/shared/theme";
 import { Period } from "@/shared/types/common";
 
 interface DailyRidesLineChartProps {
@@ -18,8 +18,9 @@ const chartConfig = {
   backgroundGradientFrom: colors.surface,
   backgroundGradientTo: colors.surface,
   decimalPlaces: 0,
-  color: (opacity = 1) => `rgba(61, 169, 252, ${opacity})`,
+  color: () => colors.info,
   labelColor: (opacity = 1) => `rgba(233, 244, 238, ${opacity})`,
+  fillShadowGradientOpacity: 1,
   propsForBackgroundLines: {
     stroke: colors.border,
     strokeDasharray: "",
@@ -128,7 +129,7 @@ export const DailyRidesLineChart = React.memo(function DailyRidesLineChart({
           datasets: [
             {
               data: ridesData.length > 0 ? ridesData : [0],
-              color: (opacity = 1) => `rgba(61, 169, 252, ${opacity})`,
+              color: () => colors.info,
             },
           ],
         }}
@@ -154,14 +155,15 @@ const styles = StyleSheet.create({
   title: {
     color: colors.text,
     fontSize: 16,
-    fontWeight: "700",
+    fontFamily: font.bold,
   },
   subtitle: {
     color: colors.textMuted,
     fontSize: 13,
+    fontFamily: font.regular,
     marginTop: 2,
   },
   chart: {
-    borderRadius: 12,
+    borderRadius: radii.md,
   },
 });
