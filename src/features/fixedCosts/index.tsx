@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { formatDecimal } from "@/shared/utils";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 import {
   AddFixedCostModal,
   FixedCostsList,
@@ -12,6 +13,7 @@ import { Card, FloatingActionButton } from "@/shared/components";
 import { colors, font, spacing } from "@/shared/theme";
 
 export default function FixedCostsScreen() {
+  const { t } = useTranslation();
   const {
     fixedCosts,
     loading,
@@ -41,13 +43,15 @@ export default function FixedCostsScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <Card raised>
-          <Text style={styles.headerTitle}>Total Diário Necessário</Text>
+          <Text style={styles.headerTitle}>
+            {t("fixedCosts.dailyTotalTitle")}
+          </Text>
           <Text style={styles.headerAmount}>
-            R$ {formatDecimal(totalDailyAmount)}/dia
+            R$ {formatDecimal(totalDailyAmount)}
+            {t("fixedCosts.dailyTotalSuffix")}
           </Text>
           <Text style={styles.headerSubtext}>
-            Você precisa fazer este valor por dia para pagar todos os custos
-            fixos nos prazos estabelecidos.
+            {t("fixedCosts.dailyTotalSubtext")}
           </Text>
         </Card>
       </View>

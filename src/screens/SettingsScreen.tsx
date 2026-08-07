@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { StyleSheet, Text, TextInput, View } from "react-native";
 import { Picker } from "@react-native-picker/picker";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { FixedAdBanner } from "@/features/ads/components";
 import { useAds } from "@/features/ads/hooks";
 import { Card, PrimaryButton } from "@/shared/components";
@@ -8,6 +9,8 @@ import { colors, font, radii, spacing } from "@/shared/theme";
 import { languages } from "@/shared/utils/languages";
 import { useTranslation } from "react-i18next";
 import i18n from "@/shared/i18n";
+
+const LANGUAGE_STORAGE_KEY = "@drivercash:language";
 
 export default function SettingsScreen() {
   const { t } = useTranslation();
@@ -21,6 +24,9 @@ export default function SettingsScreen() {
   const handleChangeLanguage = (lang: string) => {
     setSelectedLanguage(lang);
     i18n.changeLanguage(lang);
+    AsyncStorage.setItem(LANGUAGE_STORAGE_KEY, lang).catch((error) => {
+      console.error("Failed to persist language preference", error);
+    });
   };
 
   const handleApplyCoupon = async () => {

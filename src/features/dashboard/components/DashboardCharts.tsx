@@ -1,13 +1,16 @@
 import React, { useMemo } from "react";
-import { Dimensions, StyleSheet, Text, View } from "react-native";
+import { Dimensions, StyleSheet, View } from "react-native";
+import { useTranslation } from "react-i18next";
 import { formatDecimal } from "@/shared/utils";
 import { parseISODateLocal, toISODate } from "@/shared/utils/format";
 import { BarChart, LineChart } from "react-native-chart-kit";
 import { Card } from "@/shared/components";
-import { colors, font, radii, spacing } from "@/shared/theme";
+import { colors, radii, spacing } from "@/shared/theme";
 import { Transaction } from "@/features/transactions/types";
 import { Period } from "@/shared/types/common";
 import { DailyRidesLineChart } from "@/features/dashboard/components/DailyRidesLineChart";
+import { ChartsToggleHeader } from "@/features/dashboard/components/ChartsToggleHeader";
+import { useCollapsedSection } from "@/features/dashboard/hooks/useCollapsedSection";
 
 interface DashboardChartsProps {
   income: number;
@@ -48,23 +51,28 @@ export const DashboardCharts = React.memo(function DashboardCharts({
   transactions,
   period,
 }: DashboardChartsProps) {
+  const { t, i18n } = useTranslation();
   const chartWidth = screenWidth - 64;
 
-  const weekDays = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sab"];
-  const months = [
-    "Jan",
-    "Fev",
-    "Mar",
-    "Abr",
-    "Mai",
-    "Jun",
-    "Jul",
-    "Ago",
-    "Set",
-    "Out",
-    "Nov",
-    "Dez",
-  ];
+  const [incomeCollapsed, toggleIncomeCollapsed] = useCollapsedSection(
+    "@drivercash:chart-collapsed-income",
+  );
+  const [expenseCollapsed, toggleExpenseCollapsed] = useCollapsedSection(
+    "@drivercash:chart-collapsed-expense",
+  );
+  const [netProfitCollapsed, toggleNetProfitCollapsed] = useCollapsedSection(
+    "@drivercash:chart-collapsed-netprofit",
+  );
+  const [workedDaysCollapsed, toggleWorkedDaysCollapsed] = useCollapsedSection(
+    "@drivercash:chart-collapsed-workeddays",
+  );
+
+  const weekDays = t("dashboard.charts.weekDays", {
+    returnObjects: true,
+  }) as string[];
+  const months = t("dashboard.charts.months", {
+    returnObjects: true,
+  }) as string[];
 
   const groupedData = useMemo(() => {
     let labels: string[] = [];
@@ -142,7 +150,7 @@ export const DashboardCharts = React.memo(function DashboardCharts({
     }
 
     return { labels, income: groupedIncome, expense: groupedExpense, workedDays };
-  }, [transactions, period]);
+  }, [transactions, period, i18n.language]);
 
   const netProfitData = useMemo(() => {
     if (period === "weekly") {
@@ -161,97 +169,121 @@ export const DashboardCharts = React.memo(function DashboardCharts({
   return (
     <View style={styles.container}>
       <Card>
-        <Text style={styles.title}>Ganhos</Text>
-        <BarChart
-          data={{
-            labels: groupedData.labels,
-            datasets: [
-              {
-                data: groupedData.income,
-                color: () => colors.accent,
-              },
-            ],
-          }}
-          width={chartWidth}
-          height={180}
-          fromZero
-          yAxisLabel="R$ "
-          yAxisSuffix=""
-          chartConfig={chartConfig}
-          style={styles.chart}
-          showValuesOnTopOfBars
-          withHorizontalLabels
+        <ChartsToggleHeader
+          label={t("dashboard.charts.income")}
+          collapsed={incomeCollapsed}
+          onToggle={toggleIncomeCollapsed}
         />
+        {!incomeCollapsed && (
+          <BarChart
+            data={{
+              labels: groupedData.labels,
+              datasets: [
+                {
+                  data: groupedData.income,
+                  color: () => colors.accent,
+                },
+              ],
+            }}
+            width={chartWidth}
+            height={180}
+            fromZero
+            yAxisLabel="R$ "
+            yAxisSuffix=""
+            chartConfig={chartConfig}
+            style={styles.chart}
+            showValuesOnTopOfBars
+            withHorizontalLabels
+          />
+        )}
       </Card>
 
       <Card>
-        <Text style={styles.title}>Despesas</Text>
-        <BarChart
-          data={{
-            labels: groupedData.labels,
-            datasets: [
-              {
-                data: groupedData.expense,
-                color: () => colors.danger,
-              },
-            ],
-          }}
-          width={chartWidth}
-          height={180}
-          fromZero
-          yAxisLabel="R$ "
-          yAxisSuffix=""
-          chartConfig={{
-            ...chartConfig,
-            color: () => colors.danger,
-          }}
-          style={styles.chart}
-          showValuesOnTopOfBars
-          withHorizontalLabels
+        <ChartsToggleHeader
+          label={t("dashboard.charts.expense")}
+          collapsed={expenseCollapsed}
+          onToggle={toggleExpenseCollapsed}
         />
+        {!expenseCollapsed && (
+          <BarChart
+            data={{
+              labels: groupedData.labels,
+              datasets: [
+                {
+                  data: groupedData.expense,
+                  color: () => colors.danger,
+                },
+              ],
+            }}
+            width={chartWidth}
+            height={180}
+            fromZero
+            yAxisLabel="R$ "
+            yAxisSuffix=""
+            chartConfig={{
+              ...chartConfig,
+              color: () => colors.danger,
+            }}
+            style={styles.chart}
+            showValuesOnTopOfBars
+            withHorizontalLabels
+          />
+        )}
       </Card>
 
       <Card>
-        <Text style={styles.title}>Lucro liquido</Text>
-        <LineChart
-          data={{
-            labels: groupedData.labels,
-            datasets: [{ data: netProfitData.length > 0 ? netProfitData : [0] }],
-          }}
-          width={chartWidth}
-          height={190}
-          yAxisLabel="R$ "
-          yAxisSuffix=""
-          formatYLabel={formatDecimal}
-          fromZero
-          chartConfig={lineChartConfig}
-          bezier
-          style={styles.chart}
-          withDots
-          withOuterLines
-          withHorizontalLines
+        <ChartsToggleHeader
+          label={t("dashboard.charts.netProfit")}
+          collapsed={netProfitCollapsed}
+          onToggle={toggleNetProfitCollapsed}
         />
+        {!netProfitCollapsed && (
+          <LineChart
+            data={{
+              labels: groupedData.labels,
+              datasets: [{ data: netProfitData.length > 0 ? netProfitData : [0] }],
+            }}
+            width={chartWidth}
+            height={190}
+            yAxisLabel="R$ "
+            yAxisSuffix=""
+            formatYLabel={formatDecimal}
+            fromZero
+            chartConfig={lineChartConfig}
+            bezier
+            style={styles.chart}
+            withDots
+            withOuterLines
+            withHorizontalLines
+          />
+        )}
       </Card>
 
       <Card>
-        <Text style={styles.title}>Dias trabalhados</Text>
-        <LineChart
-          data={{
-            labels: groupedData.labels,
-            datasets: [{ data: groupedData.workedDays.length > 0 ? groupedData.workedDays : [0] }],
-          }}
-          width={chartWidth}
-          height={190}
-          fromZero
-          chartConfig={{
-            ...lineChartConfig,
-            color: () => colors.info,
-          }}
-          style={styles.chart}
-          withDots
-          withOuterLines
-          withHorizontalLines
+        <ChartsToggleHeader
+          label={t("dashboard.charts.workedDays")}
+          collapsed={workedDaysCollapsed}
+          onToggle={toggleWorkedDaysCollapsed}
         />
+        {!workedDaysCollapsed && (
+          <LineChart
+            data={{
+              labels: groupedData.labels,
+              datasets: [{ data: groupedData.workedDays.length > 0 ? groupedData.workedDays : [0] }],
+            }}
+            width={chartWidth}
+            height={190}
+            fromZero
+            chartConfig={{
+              ...lineChartConfig,
+              color: () => colors.info,
+            }}
+            style={styles.chart}
+            withDots
+            withOuterLines
+            withHorizontalLines
+          />
+        )}
       </Card>
 
       <DailyRidesLineChart transactions={transactions} period={period} />
@@ -263,12 +295,6 @@ const styles = StyleSheet.create({
   container: {
     gap: spacing.md,
     marginBottom: 100,
-  },
-  title: {
-    color: colors.text,
-    fontSize: 16,
-    fontFamily: font.bold,
-    marginBottom: spacing.sm,
   },
   chart: {
     borderRadius: radii.md,

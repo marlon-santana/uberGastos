@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import { Image, StyleSheet, Text, View, ScrollView } from "react-native";
+import { useTranslation } from "react-i18next";
 import { WelcomeFactory } from "@/features/welcome/factory/WelcomeFactory";
 import { WelcomeMessageStrategy } from "@/features/welcome/strategies/WelcomeMessageStrategy";
 import { FeaturedTodoList } from "@/features/welcome/components/FeaturedTodoList";
@@ -11,8 +12,9 @@ interface WelcomeViewProps {
 }
 
 export function WelcomeView({ onStart }: WelcomeViewProps) {
+  const { t } = useTranslation();
   const strategy = useMemo(() => new WelcomeMessageStrategy(), []);
-  const benefits = useMemo(() => WelcomeFactory.createBenefits(), []);
+  const benefits = useMemo(() => WelcomeFactory.createBenefits(t), [t]);
 
   return (
     <View style={styles.container}>
@@ -28,10 +30,8 @@ export function WelcomeView({ onStart }: WelcomeViewProps) {
               resizeMode="contain"
             />
           </View>
-          <Text style={styles.title}>{strategy.getTitle()}</Text>
-          <Text style={styles.subtitle}>
-            Seu aplicativo de controle financeiro para motoristas de aplicativo
-          </Text>
+          <Text style={styles.title}>{strategy.getTitle(t)}</Text>
+          <Text style={styles.subtitle}>{t("welcome.subtitle")}</Text>
         </View>
 
         <View style={styles.benefitsSection}>
@@ -39,7 +39,7 @@ export function WelcomeView({ onStart }: WelcomeViewProps) {
         </View>
 
         <View style={styles.footer}>
-          <PrimaryButton label="Começar Agora" onPress={onStart} />
+          <PrimaryButton label={t("welcome.start")} onPress={onStart} />
         </View>
       </ScrollView>
     </View>

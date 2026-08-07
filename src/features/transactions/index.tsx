@@ -8,6 +8,7 @@ import {
   Text,
   View,
 } from "react-native";
+import { useTranslation } from "react-i18next";
 import { TransactionsList } from "@/features/transactions/components/TransactionsList";
 import { FixedAdBanner } from "@/features/ads/components";
 import {
@@ -17,9 +18,9 @@ import {
 import { CategoryChipsRow } from "@/shared/components";
 import { colors, font, radii, spacing } from "@/shared/theme";
 
-const ALL_CATEGORIES_LABEL = "Todas";
-
 export default function TransactionsScreen() {
+  const { t } = useTranslation();
+  const ALL_CATEGORIES_LABEL = t("common.allCategories");
   const { transactions, loading, clearTransactions } = useTransactions();
   const { deleteCategory, isCustom } = useCategories();
   const [deleteAllSelected, setDeleteAllSelected] = useState(false);
@@ -72,12 +73,12 @@ export default function TransactionsScreen() {
 
   const handleDeleteCategory = (category: string) => {
     Alert.alert(
-      "Excluir categoria",
-      `Deseja excluir a categoria "${category}"? Os lançamentos já registrados não serão apagados.`,
+      t("transactions.deleteCategoryTitle"),
+      t("transactions.deleteCategoryMessage", { category }),
       [
-        { text: "Cancelar", style: "cancel" },
+        { text: t("common.cancel"), style: "cancel" },
         {
-          text: "Excluir",
+          text: t("common.delete"),
           style: "destructive",
           onPress: () => {
             deleteCategory(category);
@@ -111,7 +112,7 @@ export default function TransactionsScreen() {
             trackColor={{ false: colors.surfaceAlt, true: colors.primary }}
             thumbColor={colors.text}
           />
-          <Text style={styles.actionLabel}>Deletar todos</Text>
+          <Text style={styles.actionLabel}>{t("transactions.deleteAll")}</Text>
         </Pressable>
         <Pressable
           onPress={async () => {
@@ -124,7 +125,9 @@ export default function TransactionsScreen() {
             !deleteAllSelected && styles.deleteButtonDisabled,
           ]}
         >
-          <Text style={styles.deleteButtonLabel}>Limpar histórico</Text>
+          <Text style={styles.deleteButtonLabel}>
+            {t("transactions.clearHistory")}
+          </Text>
         </Pressable>
       </View>
       <CategoryChipsRow

@@ -1,6 +1,7 @@
 import React from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { Card, EmptyState } from '@/shared/components';
 import { colors, font, radii, spacing } from '@/shared/theme';
 import { formatCurrency, formatDate } from '@/shared/utils/format';
@@ -32,6 +33,8 @@ function getCategoryColor(category: string): string {
 }
 
 export function TransactionsList({ transactions }: TransactionsListProps) {
+  const { t } = useTranslation();
+
   return (
     <FlatList
       data={transactions}
@@ -40,8 +43,8 @@ export function TransactionsList({ transactions }: TransactionsListProps) {
       ListEmptyComponent={
         <EmptyState
           icon="inbox"
-          title="Nenhum lançamento ainda"
-          subtitle="Toque no + para registrar seu primeiro ganho ou despesa."
+          title={t('transactions.list.emptyTitle')}
+          subtitle={t('transactions.list.emptySubtitle')}
         />
       }
       renderItem={({ item }) => {
@@ -55,7 +58,7 @@ export function TransactionsList({ transactions }: TransactionsListProps) {
               <Text style={styles.category}>{item.category}</Text>
               <Text style={styles.meta}>
                 {formatDate(item.date)}
-                {item.ridesCount > 0 ? ` • ${item.ridesCount} corridas` : ''}
+                {item.ridesCount > 0 ? ` • ${item.ridesCount} ${t('transactions.list.rides')}` : ''}
               </Text>
               {item.description ? <Text style={styles.description}>{item.description}</Text> : null}
             </View>

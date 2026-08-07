@@ -10,6 +10,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useTranslation } from "react-i18next";
 import { PrimaryButton } from "@/shared/components";
 import { colors, font, radii, spacing } from "@/shared/theme";
 import { toISODate } from "@/shared/utils/format";
@@ -28,6 +29,7 @@ export function AddFixedCostModal({
   onClose,
   onSubmit,
 }: AddFixedCostModalProps) {
+  const { t } = useTranslation();
   const [value, setValue] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [startDate, setStartDate] = useState<string>(toISODate());
@@ -95,25 +97,25 @@ export function AddFixedCostModal({
         <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
         <SafeAreaView style={styles.sheet} edges={["bottom"]}>
           <View style={styles.dragHandle} />
-          <Text style={styles.title}>Novo Custo Fixo</Text>
+          <Text style={styles.title}>{t("fixedCosts.modal.title")}</Text>
 
           <TextInput
             keyboardType="decimal-pad"
-            placeholder="Valor total (ex: 900)"
+            placeholder={t("fixedCosts.modal.valuePlaceholder")}
             placeholderTextColor={colors.textMuted}
             value={value}
             onChangeText={setValue}
             style={styles.input}
           />
           <TextInput
-            placeholder="Descrição (ex: Aluguel de carro)"
+            placeholder={t("fixedCosts.modal.descriptionPlaceholder")}
             placeholderTextColor={colors.textMuted}
             value={description}
             onChangeText={setDescription}
             style={styles.input}
           />
           <TextInput
-            placeholder="Data inicial (YYYY-MM-DD)"
+            placeholder={t("fixedCosts.modal.startDatePlaceholder")}
             placeholderTextColor={colors.textMuted}
             value={startDate}
             onChangeText={setStartDate}
@@ -121,7 +123,7 @@ export function AddFixedCostModal({
           />
           <TextInput
             keyboardType="number-pad"
-            placeholder="Dias para pagar (ex: 10)"
+            placeholder={t("fixedCosts.modal.daysToPayoffPlaceholder")}
             placeholderTextColor={colors.textMuted}
             value={daysToPayoff}
             onChangeText={setDaysToPayoff}
@@ -129,12 +131,12 @@ export function AddFixedCostModal({
           />
 
           <PrimaryButton
-            label="Adicionar Custo Fixo"
+            label={t("fixedCosts.modal.submitButton")}
             onPress={handleSubmit}
             disabled={!canSubmit || isSubmitting}
           />
           <Pressable onPress={onClose} style={styles.cancelButton}>
-            <Text style={styles.cancelText}>Cancelar</Text>
+            <Text style={styles.cancelText}>{t("common.cancel")}</Text>
           </Pressable>
         </SafeAreaView>
       </KeyboardAvoidingView>

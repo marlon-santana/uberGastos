@@ -11,6 +11,7 @@ import {
   View,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
+import { useTranslation } from "react-i18next";
 import { PrimaryButton } from "@/shared/components";
 import { colors, font, radii, spacing } from "@/shared/theme";
 import { toISODate } from "@/shared/utils/format";
@@ -37,10 +38,11 @@ export function AddTransactionModal({
   categories,
   onAddCategory,
 }: AddTransactionModalProps) {
+  const { t } = useTranslation();
   const [type, setType] = useState<TransactionType>("income");
   const [amount, setAmount] = useState<string>("");
   const [ridesCount, setRidesCount] = useState<string>("");
-  const [category, setCategory] = useState<string>(categories[0] || "");
+  const [category, setCategory] = useState<string>("");
   const [date, setDate] = useState<string>(toISODate());
   const [description, setDescription] = useState<string>("");
   const [showNewCategoryInput, setShowNewCategoryInput] =
@@ -71,21 +73,16 @@ export function AddTransactionModal({
     setType("income");
     setAmount("");
     setRidesCount("");
-    setCategory(categories[0] || "");
+    setCategory("");
     setDate(toISODate());
     setDescription("");
     setShowNewCategoryInput(false);
     setNewCategoryName("");
-  }, [categories]);
+  }, []);
 
   React.useEffect(() => {
-    if (categories.length === 0) {
+    if (category !== "" && !categories.includes(category)) {
       setCategory("");
-      return;
-    }
-
-    if (!category || !categories.includes(category)) {
-      setCategory(categories[0]);
     }
   }, [categories, category]);
 
@@ -157,7 +154,7 @@ export function AddTransactionModal({
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
           >
-            <Text style={styles.title}>Novo Lançamento</Text>
+            <Text style={styles.title}>{t("transactions.modal.title")}</Text>
 
             <View style={styles.typeRow}>
               <Pressable
@@ -167,7 +164,9 @@ export function AddTransactionModal({
                 ]}
                 onPress={() => setType("income")}
               >
-                <Text style={styles.typeText}>Ganho</Text>
+                <Text style={styles.typeText}>
+                  {t("transactions.modal.income")}
+                </Text>
               </Pressable>
               <Pressable
                 style={[
@@ -176,13 +175,15 @@ export function AddTransactionModal({
                 ]}
                 onPress={() => setType("expense")}
               >
-                <Text style={styles.typeText}>Despesa</Text>
+                <Text style={styles.typeText}>
+                  {t("transactions.modal.expense")}
+                </Text>
               </Pressable>
             </View>
 
             <TextInput
               keyboardType="decimal-pad"
-              placeholder="Valor"
+              placeholder={t("transactions.modal.amountPlaceholder")}
               placeholderTextColor={colors.textMuted}
               value={amount}
               onChangeText={setAmount}
@@ -191,7 +192,7 @@ export function AddTransactionModal({
             {type === "income" ? (
               <TextInput
                 keyboardType="number-pad"
-                placeholder="Quantidade de corridas do dia"
+                placeholder={t("transactions.modal.ridesPlaceholder")}
                 placeholderTextColor={colors.textMuted}
                 value={ridesCount}
                 onChangeText={setRidesCount}
@@ -207,6 +208,15 @@ export function AddTransactionModal({
                     dropdownIconColor={colors.text}
                     style={styles.picker}
                   >
+                    <Picker.Item
+                      label={
+                        categories.length === 0
+                          ? t("transactions.modal.categoryPlaceholderEmpty")
+                          : t("transactions.modal.categoryPlaceholderChoose")
+                      }
+                      value=""
+                      color={colors.textMuted}
+                    />
                     {categories.map((item) => (
                       <Picker.Item key={item} label={item} value={item} />
                     ))}
@@ -216,12 +226,14 @@ export function AddTransactionModal({
                   onPress={() => setShowNewCategoryInput((prev) => !prev)}
                   style={styles.newCategoryButton}
                 >
-                  <Text style={styles.newCategoryButtonText}>Nova categoria</Text>
+                  <Text style={styles.newCategoryButtonText}>
+                    {t("transactions.modal.newCategoryButton")}
+                  </Text>
                 </Pressable>
                 {showNewCategoryInput ? (
                   <View style={styles.newCategoryRow}>
                     <TextInput
-                      placeholder="Ex: Pizzaria"
+                      placeholder={t("transactions.modal.newCategoryPlaceholder")}
                       placeholderTextColor={colors.textMuted}
                       value={newCategoryName}
                       onChangeText={setNewCategoryName}
@@ -231,21 +243,23 @@ export function AddTransactionModal({
                       onPress={handleAddCategory}
                       style={styles.newCategoryAddButton}
                     >
-                      <Text style={styles.newCategoryAddButtonText}>Adicionar</Text>
+                      <Text style={styles.newCategoryAddButtonText}>
+                        {t("transactions.modal.addCategoryButton")}
+                      </Text>
                     </Pressable>
                   </View>
                 ) : null}
               </>
             ) : null}
             <TextInput
-              placeholder="Data (YYYY-MM-DD)"
+              placeholder={t("transactions.modal.datePlaceholder")}
               placeholderTextColor={colors.textMuted}
               value={date}
               onChangeText={setDate}
               style={styles.input}
             />
             <TextInput
-              placeholder="Descrição (opcional)"
+              placeholder={t("transactions.modal.descriptionPlaceholder")}
               placeholderTextColor={colors.textMuted}
               value={description}
               onChangeText={setDescription}
@@ -253,12 +267,12 @@ export function AddTransactionModal({
             />
 
             <PrimaryButton
-              label="Adicionar Lançamento"
+              label={t("transactions.modal.submitButton")}
               onPress={handleSubmit}
               disabled={!canSubmit || isSubmitting}
             />
             <Pressable onPress={onClose} style={styles.cancelButton}>
-              <Text style={styles.cancelText}>Cancelar</Text>
+              <Text style={styles.cancelText}>{t("common.cancel")}</Text>
             </Pressable>
           </ScrollView>
         </View>
@@ -331,19 +345,19 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   pickerWrapper: {
-    height: 44,
+    height: 48,
     borderRadius: radii.md,
     borderWidth: 1,
     borderColor: colors.border,
     backgroundColor: colors.surfaceAlt,
+    paddingHorizontal: spacing.md,
     marginBottom: spacing.sm,
     overflow: "hidden",
     justifyContent: "center",
   },
   picker: {
     color: colors.text,
-    marginHorizontal: -spacing.sm,
-    marginVertical: -12,
+    marginVertical: -6,
   },
   newCategoryButton: {
     alignSelf: "flex-start",

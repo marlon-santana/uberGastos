@@ -11,6 +11,7 @@ import {
   TextInput,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
 import { Card, EmptyState } from "@/shared/components";
 import { colors, font, radii, spacing } from "@/shared/theme";
 import { FixedCost } from "@/features/fixedCosts/types";
@@ -27,6 +28,7 @@ export function FixedCostsList({
   onDelete,
   onReset,
 }: FixedCostsListProps) {
+  const { t } = useTranslation();
   const [paymentInputs, setPaymentInputs] = useState<{ [id: string]: string }>(
     {},
   );
@@ -44,8 +46,8 @@ export function FixedCostsList({
       <Card>
         <EmptyState
           icon="credit-card"
-          title="Nenhum custo fixo cadastrado"
-          subtitle="Adicione um custo fixo para calcular quanto você precisa fazer por dia."
+          title={t("fixedCosts.list.emptyTitle")}
+          subtitle={t("fixedCosts.list.emptySubtitle")}
         />
       </Card>
     );
@@ -81,15 +83,19 @@ export function FixedCostsList({
                 <Text style={styles.description}>{item.description}</Text>
                 <Text style={styles.value}>
                   R$ {formatDecimal(remaining)}{" "}
-                  <Text style={styles.remainingLabel}>(restante)</Text>
+                  <Text style={styles.remainingLabel}>
+                    {t("fixedCosts.list.remainingLabel")}
+                  </Text>
                 </Text>
                 {totalPaid > 0 && (
                   <Text style={styles.paidText}>
-                    Pago: R$ {formatDecimal(totalPaid)}
+                    {t("fixedCosts.list.paidLabel")} R$ {formatDecimal(totalPaid)}
                   </Text>
                 )}
                 {isFullyPaid && (
-                  <Text style={styles.fullyPaidText}>✓ Totalmente Pago</Text>
+                  <Text style={styles.fullyPaidText}>
+                    {t("fixedCosts.list.fullyPaidLabel")}
+                  </Text>
                 )}
               </View>
               <View style={styles.actionButtons}>
@@ -124,27 +130,38 @@ export function FixedCostsList({
             <View style={styles.divider} />
             <View style={styles.itemDetails}>
               <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>Data inicial:</Text>
+                <Text style={styles.detailLabel}>
+                  {t("fixedCosts.list.startDateLabel")}
+                </Text>
                 <Text style={styles.detailValue}>{formatDateBR(item.startDate)}</Text>
               </View>
               <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>Data final:</Text>
+                <Text style={styles.detailLabel}>
+                  {t("fixedCosts.list.endDateLabel")}
+                </Text>
                 <Text style={styles.detailValue}>{formatDateBR(item.endDate)}</Text>
               </View>
               <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>Dias para pagar:</Text>
-                <Text style={styles.detailValue}>{daysLeft} dias</Text>
+                <Text style={styles.detailLabel}>
+                  {t("fixedCosts.list.daysToPayLabel")}
+                </Text>
+                <Text style={styles.detailValue}>
+                  {daysLeft} {t("fixedCosts.list.daysSuffix")}
+                </Text>
               </View>
               <View style={[styles.detailRow, styles.highlightRow]}>
-                <Text style={styles.highlightLabel}>Valor diário:</Text>
+                <Text style={styles.highlightLabel}>
+                  {t("fixedCosts.list.dailyValueLabel")}
+                </Text>
                 <Text style={styles.highlightValue}>
-                  R$ {formatDecimal(dailyValue)}/dia
+                  R$ {formatDecimal(dailyValue)}
+                  {t("fixedCosts.list.dailyValueSuffix")}
                 </Text>
               </View>
               <View style={styles.paymentInputRow}>
                 <TextInput
                   style={styles.paymentInput}
-                  placeholder="Lançar pagamento (R$)"
+                  placeholder={t("fixedCosts.list.paymentPlaceholder")}
                   placeholderTextColor={colors.textMuted}
                   keyboardType="decimal-pad"
                   value={paymentInputs[item.id] || ""}
@@ -170,7 +187,9 @@ export function FixedCostsList({
                     Number(paymentInputs[item.id]) <= 0
                   }
                 >
-                  <Text style={styles.paymentButtonText}>Lançar</Text>
+                  <Text style={styles.paymentButtonText}>
+                    {t("fixedCosts.list.paymentButton")}
+                  </Text>
                 </Pressable>
               </View>
             </View>

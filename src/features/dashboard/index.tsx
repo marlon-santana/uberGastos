@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useTransition } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   Alert,
@@ -9,7 +10,6 @@ import {
 } from "react-native";
 import { DashboardCharts } from "@/features/dashboard/components/DashboardCharts";
 import { DailyCostCard } from "@/features/dashboard/components/DailyCostCard";
-import { ChartsToggleHeader } from "@/features/dashboard/components/ChartsToggleHeader";
 import { MoneyRain } from "@/features/dashboard/components/MoneyRain";
 import { ResetMonthNoticeModal } from "@/features/dashboard/components/ResetMonthNoticeModal";
 import { PeriodToggle } from "@/features/dashboard/components/PeriodToggle";
@@ -33,12 +33,12 @@ import { parseISODateLocal, toISODate, toMonthKey } from "@/shared/utils/format"
 import { colors, spacing } from "@/shared/theme";
 
 const MONTH_RESET_STORAGE_KEY = "@drivercash:month-reset-ignored-ids";
-const CHARTS_COLLAPSED_STORAGE_KEY = "@drivercash:dashboard-charts-collapsed";
-const ALL_CATEGORIES_LABEL = "Todas";
 
 type ResetMap = Record<string, string[]>;
 
 export default function DashboardScreen() {
+  const { t } = useTranslation();
+  const ALL_CATEGORIES_LABEL = t("common.allCategories");
   const { period, setPeriod } = useDashboard();
   const [isPeriodPending, startPeriodTransition] = useTransition();
   const { transactions, addTransaction, loading } = useTransactions();
@@ -50,7 +50,6 @@ export default function DashboardScreen() {
   const [showCongrats, setShowCongrats] = useState(false);
   const [showResetNotice, setShowResetNotice] = useState(false);
   const [resetMap, setResetMap] = useState<ResetMap>({});
-  const [chartsCollapsed, setChartsCollapsed] = useState<boolean>(false);
   const [selectedCategory, setSelectedCategory] = useState<string>(
     ALL_CATEGORIES_LABEL,
   );
@@ -91,37 +90,6 @@ export default function DashboardScreen() {
     return () => {
       mounted = false;
     };
-  }, []);
-
-  React.useEffect(() => {
-    let mounted = true;
-
-    const loadChartsCollapsed = async () => {
-      try {
-        const stored = await AsyncStorage.getItem(CHARTS_COLLAPSED_STORAGE_KEY);
-        if (mounted && stored !== null) {
-          setChartsCollapsed(stored === "true");
-        }
-      } catch (error) {
-        console.error("Failed to load charts visibility preference", error);
-      }
-    };
-
-    loadChartsCollapsed();
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  const handleToggleCharts = React.useCallback(() => {
-    setChartsCollapsed((prev) => {
-      const next = !prev;
-      AsyncStorage.setItem(CHARTS_COLLAPSED_STORAGE_KEY, String(next)).catch((error) => {
-        console.error("Failed to persist charts visibility preference", error);
-      });
-      return next;
-    });
   }, []);
 
   const currentMonthKey = toMonthKey();
@@ -183,12 +151,12 @@ export default function DashboardScreen() {
   const handleDeleteCategory = React.useCallback(
     (category: string) => {
       Alert.alert(
-        "Excluir categoria",
-        `Deseja excluir a categoria "${category}"?`,
+        t("dashboard.deleteCategoryTitle"),
+        t("dashboard.deleteCategoryMessage", { category }),
         [
-          { text: "Cancelar", style: "cancel" },
+          { text: t("common.cancel"), style: "cancel" },
           {
-            text: "Excluir",
+            text: t("common.delete"),
             style: "destructive",
             onPress: () => {
               deleteCategory(category);
@@ -200,7 +168,7 @@ export default function DashboardScreen() {
         ],
       );
     },
-    [deleteCategory, selectedCategory],
+    [deleteCategory, selectedCategory, t, ALL_CATEGORIES_LABEL],
   );
 
   React.useEffect(() => {
@@ -272,15 +240,19 @@ export default function DashboardScreen() {
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.cardsRow}>
-          <SummaryCard label="Ganhos" value={metrics.income} tone="income" />
           <SummaryCard
-            label="Despesas"
+            label={t("dashboard.income")}
+            value={metrics.income}
+            tone="income"
+          />
+          <SummaryCard
+            label={t("dashboard.expense")}
             value={metrics.expense}
             tone="expense"
           />
         </View>
         <SummaryCard
-          label="Lucro"
+          label={t("dashboard.profit")}
           value={metrics.netProfit}
           tone="profit"
           emphasis
@@ -293,7 +265,10 @@ export default function DashboardScreen() {
           />
         )}
 
-        <PrimaryButton label="Resetar mês Atual" onPress={handleResetMonth} />
+        <PrimaryButton
+          label={t("dashboard.resetMonth")}
+          onPress={handleResetMonth}
+        />
 
         <View style={styles.periodRow}>
           <PeriodToggle
@@ -324,25 +299,17 @@ export default function DashboardScreen() {
         {transactions.length === 0 ? (
           <EmptyState
             icon="bar-chart-2"
-            title="Nenhum lançamento ainda"
-            subtitle="Registre seu primeiro ganho ou despesa para ver seus gráficos aqui."
+            title={t("dashboard.emptyTitle")}
+            subtitle={t("dashboard.emptySubtitle")}
           />
         ) : (
-          <>
-            <ChartsToggleHeader
-              collapsed={chartsCollapsed}
-              onToggle={handleToggleCharts}
-            />
-            {!chartsCollapsed && (
-              <DashboardCharts
-                income={metrics.income}
-                expense={metrics.expense}
-                netProfit={metrics.netProfit}
-                transactions={chartTransactions}
-                period={period}
-              />
-            )}
-          </>
+          <DashboardCharts
+            income={metrics.income}
+            expense={metrics.expense}
+            netProfit={metrics.netProfit}
+            transactions={chartTransactions}
+            period={period}
+          />
         )}
       </ScrollView>
 

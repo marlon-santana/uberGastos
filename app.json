@@ -29,6 +29,13 @@
           "androidAppId": "ca-app-pub-3940256099942544~3347511713",
           "iosAppId": "ca-app-pub-3940256099942544~1458002511"
         }
+      ],
+      [
+        "expo-stallion-plugin",
+        {
+          "projectId": "6a74849356071e9ca6c794a5",
+          "appToken": "spb_ap_k-v3ptz9TnkQJzW7qxLRhHOUW96muj0IWze9QDNBo9"
+        }
       ]
     ]
   }

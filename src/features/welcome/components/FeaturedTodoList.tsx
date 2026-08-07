@@ -1,5 +1,6 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 import { WelcomeBenefit } from "@/features/welcome/types/welcome";
 import { colors, font, radii, spacing } from "@/shared/theme";
 
@@ -8,9 +9,11 @@ interface FeaturedTodoListProps {
 }
 
 export function FeaturedTodoList({ items }: FeaturedTodoListProps) {
+  const { t } = useTranslation();
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Por que usar?</Text>
+      <Text style={styles.title}>{t("welcome.why")}</Text>
       {items.map((item) => (
         <View key={item.id} style={styles.row}>
           <Text style={styles.emoji}>{item.emoji}</Text>

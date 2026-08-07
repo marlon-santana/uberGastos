@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { Card } from '@/shared/components';
 import { colors, font, radii, spacing } from '@/shared/theme';
 import { formatCurrency } from '@/shared/utils/format';
@@ -11,11 +12,14 @@ interface DailyCostCardProps {
 }
 
 export function DailyCostCard({ todayNetProfit, totalDailyAmount }: DailyCostCardProps) {
+  const { t } = useTranslation();
   const diff = todayNetProfit - totalDailyAmount;
   const covered = diff >= 0;
   const color = covered ? colors.success : colors.danger;
   const icon = covered ? 'check-circle' : 'alert-circle';
-  const label = covered ? 'Meta do dia batida' : 'Falta para cobrir hoje';
+  const label = covered
+    ? t('dashboard.dailyCost.covered')
+    : t('dashboard.dailyCost.pending');
 
   return (
     <Card style={styles.card}>

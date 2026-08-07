@@ -1,12 +1,13 @@
-﻿import { WelcomeBenefit } from '@/features/welcome/types/welcome';
+import { TFunction } from 'i18next';
+import { WelcomeBenefit } from '@/features/welcome/types/welcome';
 
 export class WelcomeFactory {
-  static createBenefits(): WelcomeBenefit[] {
+  static createBenefits(t: TFunction): WelcomeBenefit[] {
     return [
-      { id: '1', emoji: '✅', label: 'Cadastro de corridas' },
-      { id: '2', emoji: '📊', label: 'Relatórios financeiros' },
-      { id: '3', emoji: '🛠️', label: 'Configurações' },
-      { id: '4', emoji: '💡', label: 'Dicas de uso' }
+      { id: '1', emoji: '✅', label: t('welcome.benefits.rides') },
+      { id: '2', emoji: '📊', label: t('welcome.benefits.reports') },
+      { id: '3', emoji: '🛠️', label: t('welcome.benefits.settings') },
+      { id: '4', emoji: '💡', label: t('welcome.benefits.tips') },
     ];
   }
 }

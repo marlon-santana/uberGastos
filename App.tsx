@@ -1,5 +1,6 @@
 import React from "react";
-import "@/shared/i18n";
+import i18n from "@/shared/i18n";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { StyleSheet, ActivityIndicator, View } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
@@ -13,9 +14,24 @@ import { WelcomeProvider } from "@/features/welcome/context";
 import { AdsProvider } from "@/features/ads/context";
 import { AppNavigator } from "@/navigation";
 import { useLoadFonts } from "@/shared/hooks/useLoadFonts";
+import { withStallion } from "react-native-stallion";
 
-export default function App() {
+const LANGUAGE_STORAGE_KEY = "@drivercash:language";
+
+function App() {
   const fontsLoaded = useLoadFonts();
+
+  React.useEffect(() => {
+    AsyncStorage.getItem(LANGUAGE_STORAGE_KEY)
+      .then((stored) => {
+        if (stored) {
+          i18n.changeLanguage(stored);
+        }
+      })
+      .catch((error) => {
+        console.error("Failed to load language preference", error);
+      });
+  }, []);
 
   if (!fontsLoaded) {
     return (
@@ -66,3 +82,5 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
 });
+
+export default withStallion(App);

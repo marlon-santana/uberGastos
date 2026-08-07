@@ -1,11 +1,14 @@
 import React, { useMemo } from "react";
 import { Dimensions, StyleSheet, Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 import { BarChart } from "react-native-chart-kit";
 import { Transaction } from "@/features/transactions/types";
 import { Card } from "@/shared/components";
 import { parseISODateLocal, toISODate } from "@/shared/utils/format";
 import { colors, font, radii, spacing } from "@/shared/theme";
 import { Period } from "@/shared/types/common";
+import { ChartsToggleHeader } from "@/features/dashboard/components/ChartsToggleHeader";
+import { useCollapsedSection } from "@/features/dashboard/hooks/useCollapsedSection";
 
 interface DailyRidesLineChartProps {
   transactions: Transaction[];
@@ -41,25 +44,18 @@ export const DailyRidesLineChart = React.memo(function DailyRidesLineChart({
   transactions,
   period,
 }: DailyRidesLineChartProps) {
+  const { t, i18n } = useTranslation();
   const chartWidth = screenWidth - 64;
+  const [collapsed, toggleCollapsed] = useCollapsedSection(
+    "@drivercash:chart-collapsed-dailyrides",
+  );
 
   const { labels, ridesData, subtitle, title } = useMemo(() => {
     if (period === "monthly") {
       const currentYear = new Date().getFullYear();
-      const months = [
-        "Jan",
-        "Fev",
-        "Mar",
-        "Abr",
-        "Mai",
-        "Jun",
-        "Jul",
-        "Ago",
-        "Set",
-        "Out",
-        "Nov",
-        "Dez",
-      ];
+      const months = t("dashboard.charts.months", {
+        returnObjects: true,
+      }) as string[];
 
       const ridesData = Array(12).fill(0);
       transactions.forEach((transaction) => {
@@ -76,8 +72,8 @@ export const DailyRidesLineChart = React.memo(function DailyRidesLineChart({
       return {
         labels: months,
         ridesData,
-        title: "Corridas totais",
-        subtitle: `Total no ano: ${total}`,
+        title: t("dashboard.charts.ridesTotal"),
+        subtitle: t("dashboard.charts.totalYear", { count: total }),
       };
     }
 
@@ -112,56 +108,55 @@ export const DailyRidesLineChart = React.memo(function DailyRidesLineChart({
     return {
       labels,
       ridesData,
-      title: "Corridas por dia",
-      subtitle: `Total de hoje: ${todayTotal}`,
+      title: t("dashboard.charts.ridesPerDay"),
+      subtitle: t("dashboard.charts.totalToday", { count: todayTotal }),
     };
-  }, [transactions, period]);
+  }, [transactions, period, i18n.language]);
 
   return (
     <Card>
-      <View style={styles.header}>
-        <Text style={styles.title}>{title}</Text>
-        <Text style={styles.subtitle}>{subtitle}</Text>
-      </View>
-      <BarChart
-        data={{
-          labels,
-          datasets: [
-            {
-              data: ridesData.length > 0 ? ridesData : [0],
-              color: () => colors.info,
-            },
-          ],
-        }}
-        width={chartWidth}
-        height={190}
-        fromZero
-        yAxisLabel=""
-        yAxisSuffix=""
-        yAxisInterval={1}
-        chartConfig={chartConfig}
-        style={styles.chart}
-        withInnerLines
-        showValuesOnTopOfBars
+      <ChartsToggleHeader
+        label={title}
+        collapsed={collapsed}
+        onToggle={toggleCollapsed}
       />
+      {!collapsed && (
+        <>
+          <Text style={styles.subtitle}>{subtitle}</Text>
+          <BarChart
+            data={{
+              labels,
+              datasets: [
+                {
+                  data: ridesData.length > 0 ? ridesData : [0],
+                  color: () => colors.info,
+                },
+              ],
+            }}
+            width={chartWidth}
+            height={190}
+            fromZero
+            yAxisLabel=""
+            yAxisSuffix=""
+            yAxisInterval={1}
+            chartConfig={chartConfig}
+            style={styles.chart}
+            withInnerLines
+            showValuesOnTopOfBars
+          />
+        </>
+      )}
     </Card>
   );
 });
 
 const styles = StyleSheet.create({
-  header: {
-    marginBottom: spacing.sm,
-  },
-  title: {
-    color: colors.text,
-    fontSize: 16,
-    fontFamily: font.bold,
-  },
   subtitle: {
     color: colors.textMuted,
     fontSize: 13,
     fontFamily: font.regular,
     marginTop: 2,
+    marginBottom: spacing.sm,
   },
   chart: {
     borderRadius: radii.md,
