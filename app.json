@@ -37,6 +37,12 @@
           "appToken": "spb_ap_k-v3ptz9TnkQJzW7qxLRhHOUW96muj0IWze9QDNBo9"
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "a2f01231-52f8-4707-ae0c-783d503e6725"
+      }
+    },
+    "owner": "marlonnig"
   }
 }
