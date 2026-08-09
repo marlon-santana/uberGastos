@@ -22,6 +22,7 @@ export function CategoryChipsRow({
     <ScrollView
       horizontal
       showsHorizontalScrollIndicator={false}
+      style={styles.scroll}
       contentContainerStyle={styles.row}
     >
       {items.map((item) => {
@@ -68,8 +69,17 @@ export function CategoryChipsRow({
   );
 }
 
+const CHIP_HEIGHT = 40;
+
 const styles = StyleSheet.create({
+  scroll: {
+    flexGrow: 0,
+    flexShrink: 0,
+    height: CHIP_HEIGHT + spacing.xs,
+  },
   row: {
+    flexGrow: 0,
+    alignItems: 'center',
     gap: spacing.xs,
     paddingBottom: spacing.xs,
   },
@@ -81,7 +91,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     justifyContent: 'center',
-    minHeight: 40,
+    height: CHIP_HEIGHT,
+    flexGrow: 0,
+    flexShrink: 0,
   },
   chipActive: {
     backgroundColor: colors.primary,

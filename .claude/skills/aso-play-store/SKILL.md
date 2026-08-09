@@ -81,7 +81,10 @@ Como validar em vez de adivinhar:
 
 - Use `WebSearch` para ver como o público realmente nomeia o problema e que
   termos circulam na categoria — para **pesquisar demanda**, nunca para copiar
-  texto de concorrente.
+  texto de concorrente. Pesquisar apps concorrentes reais na Play Store (nome,
+  descrição pública) é uma fonte válida de vocabulário de categoria — desde
+  que o resultado seja reescrito com as palavras e a estrutura do app em
+  questão, nunca colado.
 - Inclua a forma conversacional/por voz ("app pra editar foto com IA", "como
   remover fundo de imagem"): casa com long-tail e com busca falada.
 - Prefira sinônimos e variações a repetir o mesmo termo — é o que evita
@@ -97,6 +100,11 @@ Como validar em vez de adivinhar:
   da saída não ficarem redundantes: entregue em **Nome otimizado** o valor
   exato recomendado, e em **Título** 2–3 variações alternativas do mesmo campo
   para o usuário testar.
+- **Cuidado com marca registrada de terceiros no nome:** mesmo quando apps
+  concorrentes colocam marcas de plataforma (ex.: "Uber", "99") direto no
+  título, isso é risco de política/trademark do Google Play. Prefira manter
+  esses nomes só na descrição, de forma nominativa/descritiva ("compatível
+  com Uber, 99, InDrive"), e avise o usuário dessa troca ao entregar o nome.
 
 ## Passo 4 — Descrição curta
 
@@ -140,19 +148,53 @@ Para a descrição completa, salve num arquivo e rode `wc -m arquivo.txt`
 Publique a contagem junto de cada campo na saída (`Nome (28/30)`) — assim o
 usuário cola direto no Console sem conferir de novo.
 
+## Onde colar na Play Console (navegação atual)
+
+A navegação da Play Console é reorganizada de tempos em tempos e confunde
+quem já usou uma versão antiga — confirme sempre pela descrição da tela, não
+só pelo rótulo do menu, e avise o usuário que o caminho abaixo pode mudar:
+
+- **Menu lateral → "Aumentar número de usuários"** é o item guarda-chuva.
+  Clicar nele expande sub-itens, entre eles:
+  - **"Presença na loja"**, que por sua vez abre:
+    - **"Páginas de detalhes do app"** — é aqui que ficam **Nome do app**,
+      **Descrição breve** e **Descrição completa** do idioma padrão (o antigo
+      "Ficha principal da loja"/"Main store listing"). É o destino do texto
+      gerado por esta skill.
+    - **"Configurações da loja"** — **não** é onde vai o texto ASO. Aqui
+      ficam **Categoria do app**, **Tags**, **Dados de contato** (e-mail
+      obrigatório) e **Marketing externo**. Categoria é obrigatória; Tags são
+      escolhidas de uma lista fixa do Google (não é texto livre, máx. 5) e
+      reforçam a descoberta por navegação — nunca marcar categoria/tag que
+      não corresponda a uma função real do app (risco de rejeição).
+  - **"Traduções"** — item **separado** de "Presença na loja" (não fica
+    dentro dela). É onde se adiciona cada idioma extra da ficha: cada idioma
+    novo abre seus **próprios** campos de nome/descrição curta/completa — não
+    é um campo único traduzido automaticamente. Lembrar sempre que ASO é por
+    idioma (ver seção "Linguagem" abaixo): colar a tradução literal do texto
+    pt-BR sem refazer a pesquisa de keyword daquele mercado desperdiça o
+    campo.
+- Se o usuário não achar um desses itens, oriente a procurar pelo **texto da
+  tela** ("Gerencie como seu app é apresentado...", "Categoria do app",
+  "Traduções") em vez de insistir num nome de menu que pode ter mudado.
+
 ## Nunca
 
 - Spam, _keyword stuffing_, palavra repetida sem contexto.
 - Copiar texto de concorrente.
 - Prometer recurso que o app não tem.
 - Excesso de CAIXA ALTA; emoji no nome (zero) e em excesso na descrição.
+- Marca registrada de terceiro no **nome** do app (ver Passo 3).
+- Categoria ou tag que não reflete uma função real do app (ver "Onde colar
+  na Play Console").
 
 ## Linguagem
 
 Português brasileiro; tom profissional, claro, persuasivo, natural. Se o app
 for para outro mercado, adapte o idioma mantendo estrutura e regras — e lembre
-que ASO é **por idioma**: cada locale da Play Console tem a própria ficha, e
-traduzir sem refazer a pesquisa de keywords desperdiça o campo.
+que ASO é **por idioma**: cada locale da Play Console tem a própria ficha
+(gerenciada em "Traduções", ver seção acima), e traduzir sem refazer a
+pesquisa de keywords desperdiça o campo.
 
 ## Saída — SEMPRE nesta ordem
 
@@ -170,9 +212,9 @@ Com a contagem de caracteres nos 4 primeiros itens:
 10. Justificativa da nota
 
 Em **Sugestões de melhorias**, inclua o que o texto sozinho não resolve quando
-for relevante: ícone, screenshots, vídeo, avaliações e velocidade de instalação
-também pesam no ranqueamento — dizer isso evita a impressão de que só a cópia
-decide posição.
+for relevante: ícone, screenshots, vídeo, avaliações, categoria/tags corretas
+(ver "Onde colar na Play Console") e velocidade de instalação também pesam no
+ranqueamento — dizer isso evita a impressão de que só a cópia decide posição.
 
 ## Nota ASO — como calcular
 

@@ -41,7 +41,7 @@ $htmlUrl = "file:///" + ($Html -replace '\\','/')
 
 function Capture([double]$t, [string]$png) {
   $tstr = $t.ToString("0.####", $ci)
-  $url = "$htmlUrl?t=$tstr"
+  $url = $htmlUrl + "?t=" + $tstr
   & $chrome --headless --disable-gpu --hide-scrollbars --force-device-scale-factor=1 `
     --window-size=$Width,$Height --virtual-time-budget=1200 `
     --screenshot="$png" $url 2>$null | Out-Null
