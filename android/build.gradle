@@ -1,5 +1,15 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
+// Google Play requires the target API level to stay within one year of the
+// latest Android release (Android 16 / API 36 as of the Aug 2026 deadline).
+// Override the expo-root-project plugin's defaults (compileSdk/targetSdk 35)
+// before it applies, since it only fills in values that aren't already set.
+ext {
+  compileSdkVersion = 36
+  targetSdkVersion = 36
+  buildToolsVersion = "36.0.0"
+}
+
 buildscript {
   repositories {
     google()
