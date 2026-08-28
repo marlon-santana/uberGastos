@@ -6,6 +6,9 @@ node_modules/
 
 # Build outputs
 android/app/build/
+# Holds the autolinking cache, which stores machine-absolute paths.
+# It must never travel to another machine — see android/settings.gradle.
+android/build/
 
 # Coverage
 .early.coverage/
@@ -19,6 +22,11 @@ Thumbs.db
 
 # Misc
 .env
+.env.local
+.env*.local
+
+# Production signing (never commit)
+credentials.json
 
 # Ignore IDE settings
 .vscode/

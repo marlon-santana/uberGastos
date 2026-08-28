@@ -5,7 +5,8 @@ import DashboardScreen from "@/features/dashboard";
 import TransactionsScreen from "@/features/transactions";
 import FixedCostsScreen from "@/features/fixedCosts";
 import SettingsScreen from "@/screens/SettingsScreen";
-import { colors } from "@/shared/theme";
+import { useAds } from "@/features/ads/hooks";
+import { colors, font } from "@/shared/theme";
 import { Feather } from "@expo/vector-icons";
 
 export type RootTabParamList = {
@@ -18,6 +19,8 @@ export type RootTabParamList = {
 const Tab = createBottomTabNavigator<RootTabParamList>();
 
 export function TabNavigator() {
+  const { maybeShowInterstitial } = useAds();
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -25,8 +28,8 @@ export function TabNavigator() {
         tabBarStyle: {
           backgroundColor: colors.surface,
           borderTopColor: colors.border,
-          paddingBottom: Platform.OS === 'ios' ? 20 : 8,
-          height: Platform.OS === 'ios' ? 88 : 68,
+          paddingBottom: Platform.OS === "ios" ? 32 : 20, // aumenta o padding para evitar sobreposição
+          height: Platform.OS === "ios" ? 100 : 80, // aumenta a altura para acomodar o padding extra
           borderTopWidth: 1,
         },
         tabBarActiveTintColor: colors.primary,
@@ -36,16 +39,16 @@ export function TabNavigator() {
         },
         tabBarLabelStyle: {
           fontSize: 12,
-          fontWeight: '600',
+          fontFamily: font.semibold,
         },
         tabBarIcon: ({ color, size }) => {
           let iconName: keyof typeof Feather.glyphMap = "circle";
           if (route.name === "Dashboard") {
-            iconName = "grid";
+            iconName = "bar-chart-2";
           } else if (route.name === "Historico") {
-            iconName = "clock";
+            iconName = "list";
           } else if (route.name === "CustoFixo") {
-            iconName = "dollar-sign";
+            iconName = "repeat";
           } else if (route.name === "Configuracoes") {
             iconName = "settings";
           }
@@ -54,21 +57,36 @@ export function TabNavigator() {
         },
       })}
     >
-      <Tab.Screen name="Dashboard" component={DashboardScreen} />
+      <Tab.Screen
+        name="Dashboard"
+        component={DashboardScreen}
+        listeners={{
+          tabPress: () => maybeShowInterstitial("tab_dashboard"),
+        }}
+      />
       <Tab.Screen
         name="Historico"
         component={TransactionsScreen}
         options={{ title: "Historico" }}
+        listeners={{
+          tabPress: () => maybeShowInterstitial("tab_historico"),
+        }}
       />
       <Tab.Screen
         name="CustoFixo"
         component={FixedCostsScreen}
         options={{ title: "Custo Fixo" }}
+        listeners={{
+          tabPress: () => maybeShowInterstitial("tab_custo_fixo"),
+        }}
       />
       <Tab.Screen
         name="Configuracoes"
         component={SettingsScreen}
         options={{ title: "Configuracoes" }}
+        listeners={{
+          tabPress: () => maybeShowInterstitial("tab_configuracoes"),
+        }}
       />
     </Tab.Navigator>
   );

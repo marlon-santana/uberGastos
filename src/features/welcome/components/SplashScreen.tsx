@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, Text, View } from 'react-native';
-import { colors } from '@/shared/theme';
+import { colors, font } from '@/shared/theme';
 
 interface SplashScreenProps {
   onComplete: () => void;
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
   },
   icon: {
     fontSize: 72,
-    fontWeight: '700',
+    fontFamily: font.bold,
     color: colors.accent
   },
   nameContainer: {
@@ -141,12 +141,13 @@ const styles = StyleSheet.create({
   },
   letter: {
     fontSize: 36,
-    fontWeight: '700',
+    fontFamily: font.bold,
     color: colors.text,
     marginHorizontal: 2
   },
   tagline: {
     fontSize: 14,
+    fontFamily: font.regular,
     color: colors.textMuted,
     fontStyle: 'italic',
     textAlign: 'center',

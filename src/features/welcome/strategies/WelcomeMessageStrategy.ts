@@ -1,5 +1,7 @@
+import { TFunction } from "i18next";
+
 export class WelcomeMessageStrategy {
-  getTitle(): string {
-    return 'Bem-vindo ao DriverCash - Controle total da sua vida financeira como motorista de aplicativo';
+  getTitle(t: TFunction): string {
+    return t("welcome.title");
   }
 }

@@ -9,6 +9,15 @@ import React, {
 import { FixedCostFactory } from "@/features/fixedCosts/factory";
 import { FixedCostStorageService } from "@/features/fixedCosts/services";
 import { FixedCost, FixedCostInput } from "@/features/fixedCosts/types";
+import { parseISODateLocal, toISODate } from "@/shared/utils/format";
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+function daysUntil(dateStr: string): number {
+  const target = parseISODateLocal(dateStr).getTime();
+  const now = Date.now();
+  return Math.max(Math.ceil((target - now) / DAY_MS), 1);
+}
 
 interface FixedCostsContextValue {
   fixedCosts: FixedCost[];
@@ -34,10 +43,17 @@ export function FixedCostsProvider({ children }: PropsWithChildren) {
     let mounted = true;
 
     const hydrate = async () => {
-      const stored = await storageService.load();
-      if (mounted) {
-        setFixedCosts(stored);
-        setLoading(false);
+      try {
+        const stored = await storageService.load();
+        if (mounted) {
+          setFixedCosts(stored);
+        }
+      } catch (error) {
+        console.error('Failed to hydrate fixed costs', error);
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
       }
     };
 
@@ -63,18 +79,17 @@ export function FixedCostsProvider({ children }: PropsWithChildren) {
           if (cost.id !== id) return cost;
           const payments = [
             ...(cost.payments || []),
-            { date: new Date().toISOString().split("T")[0], amount },
+            { date: toISODate(), amount },
           ];
-          // Recalcular valor diário e dias restantes
+          // Recalcular valor diário com base nos dias reais até a data final
           const totalPaid = payments.reduce((sum, p) => sum + p.amount, 0);
-          const remaining = cost.value - totalPaid;
-          const paymentsCount = payments.length;
-          const daysLeft = Math.max(cost.daysToPayoff - paymentsCount, 1);
+          const remaining = Math.max(cost.value - totalPaid, 0);
+          const daysLeft = daysUntil(cost.endDate);
           const dailyAmount = remaining / daysLeft;
           return {
             ...cost,
             payments,
-            dailyAmount: dailyAmount > 0 ? dailyAmount : 0,
+            dailyAmount,
           };
         });
         storageService.save(next);
@@ -96,12 +111,17 @@ export function FixedCostsProvider({ children }: PropsWithChildren) {
     setFixedCosts((prev) => {
       const next = prev.map((cost) => {
         if (cost.id !== id) return cost;
-        // Recalcular o valor diário original
+        // Inicia um novo ciclo a partir de hoje, recalculando a data final
         const dailyAmount = cost.value / cost.daysToPayoff;
+        const newStartDate = new Date();
+        const newEndDate = new Date(newStartDate);
+        newEndDate.setDate(newEndDate.getDate() + cost.daysToPayoff);
         return {
           ...cost,
           payments: [],
           dailyAmount,
+          startDate: toISODate(newStartDate),
+          endDate: toISODate(newEndDate),
         };
       });
       storageService.save(next);

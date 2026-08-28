@@ -22,6 +22,34 @@ plugins {
   id("expo-autolinking-settings")
 }
 
+// EAS/CI guard — do not remove.
+// `autolinkLibrariesFromCommand` below caches its output in
+// build/generated/autolinking/autolinking.json, and that file stores ABSOLUTE paths
+// (one `sourceDir` per native module). The cache is only invalidated when
+// package.json/lockfiles change — never when the paths themselves stop being valid.
+// So a cache generated on Windows (C:\...\node_modules\...) and restored on EAS's
+// Linux builder makes every module's projectDir point at a path that doesn't exist
+// there: Gradle includes the projects but their Android plugin never runs, and
+// resolution fails with "No matching variant of project :react-native-... /
+// No variants exist" for every autolinked module.
+// Drop the cache whenever it was generated for a different project root.
+// https://github.com/expo/expo/issues/42370
+def autolinkingCacheDir = new File(rootDir, "build/generated/autolinking")
+def autolinkingCacheFile = new File(autolinkingCacheDir, "autolinking.json")
+if (autolinkingCacheFile.isFile()) {
+  def cacheIsStale = true
+  try {
+    def cachedRoot = new groovy.json.JsonSlurper().parse(autolinkingCacheFile)?.root
+    cacheIsStale = cachedRoot == null ||
+      new File(cachedRoot.toString()).canonicalFile != rootDir.parentFile.canonicalFile
+  } catch (Exception ignored) {
+    // Unreadable or truncated cache: regenerate it.
+  }
+  if (cacheIsStale) {
+    autolinkingCacheDir.deleteDir()
+  }
+}
+
 extensions.configure(com.facebook.react.ReactSettingsExtension) { ex ->
   if (System.getenv('EXPO_USE_COMMUNITY_AUTOLINKING') == '1') {
     ex.autolinkLibrariesFromCommand()

@@ -2,4 +2,6 @@
   <string name="app_name">DriverCash</string>
   <string name="expo_splash_screen_resize_mode" translatable="false">contain</string>
   <string name="expo_splash_screen_status_bar_translucent" translatable="false">false</string>
+  <string name="StallionProjectId">6a74849356071e9ca6c794a5</string>
+  <string name="StallionAppToken">spb_ap_k-v3ptz9TnkQJzW7qxLRhHOUW96muj0IWze9QDNBo9</string>
 </resources>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Period } from '@/shared/types/common';
-import { colors, radii, spacing } from '@/shared/theme';
+import { colors, font, radii, spacing } from '@/shared/theme';
 
 interface PeriodToggleProps {
   selected: Period;
@@ -50,9 +50,9 @@ const styles = StyleSheet.create({
   },
   label: {
     color: colors.text,
-    fontWeight: '600'
+    fontFamily: font.semibold
   },
   activeLabel: {
-    color: '#0B1110'
+    color: colors.onPrimary
   }
 });

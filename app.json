@@ -5,7 +5,9 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
+    "icon": "./src/shared/assets/icons/icon-1024.png",
     "splash": {
+      "image": "./src/shared/assets/icons/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#0B1110"
     },
@@ -13,7 +15,34 @@
       "**/*"
     ],
     "android": {
-      "package": "com.marlonnig.drivercash"
-    }
+      "package": "com.marlonnig.drivercash",
+      "adaptiveIcon": {
+        "foregroundImage": "./src/shared/assets/icons/adaptive-icon-foreground.png",
+        "backgroundColor": "#0B1110"
+      }
+    },
+    "plugins": [
+      "expo-asset",
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-3940256099942544~3347511713",
+          "iosAppId": "ca-app-pub-3940256099942544~1458002511"
+        }
+      ],
+      [
+        "expo-stallion-plugin",
+        {
+          "projectId": "6a74849356071e9ca6c794a5",
+          "appToken": "spb_ap_k-v3ptz9TnkQJzW7qxLRhHOUW96muj0IWze9QDNBo9"
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "a2f01231-52f8-4707-ae0c-783d503e6725"
+      }
+    },
+    "owner": "marlonnig"
   }
 }
